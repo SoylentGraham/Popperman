@@ -36,8 +36,11 @@ Material:
         name: TileEmpty
       second: {r: 0.5692564, g: 0.77205884, b: 0.3746756, a: 1}
     - first:
+        name: TileFlame
+      second: {r: 1, g: 0, b: 0, a: 1}
+    - first:
         name: TileInvalid
-      second: {r: 1, g: 0, b: 1, a: 1}
+      second: {r: 0.9044118, g: 0.47215614, b: 0.9044118, a: 1}
     - first:
         name: TilePlayer
       second: {r: 0, g: 1, b: 1, a: 1}

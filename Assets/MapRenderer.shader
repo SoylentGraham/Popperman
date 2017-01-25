@@ -10,6 +10,7 @@
 		TileInvalid("TileInvalid",COLOR) = (1,0,1,1)
 		TilePlayer("TilePlayer",COLOR) = (0,1,1,1)
 		TileBomb("TileBomb",COLOR) = (0,0,0,1)
+		TileFlame("TileFlame", COLOR) = (1,0,0,1)
 	}
 	SubShader
 	{
@@ -41,12 +42,15 @@
 		#define TILE_WALL	2
 		#define TILE_BOMB	4
 		#define TILE_PLAYER	5
+		#define TILE_FLAME	6
+
 			float4 TileEmpty;
 			float4 TileSolid;
 			float4 TileWall;
 			float4 TileInvalid;
 			float4 TilePlayer;
 			float4 TileBomb;
+			float4 TileFlame;
 
 		#define MAX_WIDTH	20
 		#define MAX_HEIGHT	20
@@ -75,6 +79,7 @@
 					case TILE_WALL:		return TileWall;
 					case TILE_BOMB:		return TileBomb;
 					case TILE_PLAYER:	return TilePlayer;
+					case TILE_FLAME:	return TileFlame;
 					default:			return TileInvalid;
 				}
 			}

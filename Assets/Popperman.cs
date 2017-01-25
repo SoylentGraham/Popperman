@@ -20,6 +20,7 @@ public class PopperMan
 		//	game tiles
 		Bomb,
 		Player,
+		Flame,
 	}
 
 	public enum Direction

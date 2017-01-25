@@ -2,6 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+[System.Serializable]
+public class UnityEvent_Bomb : UnityEngine.Events.UnityEvent <Game.Bomb> {}
+
+
+
 public class Game : MonoBehaviour {
 
 	public class Bomb
@@ -35,9 +41,10 @@ public class Game : MonoBehaviour {
 	}
 
 	[Header("Game events - eg sound")]
-	UnityEngine.Events.UnityEvent	OnBombExplode;
-	UnityEngine.Events.UnityEvent	OnPlayerDeathExplode;
-	UnityEngine.Events.UnityEvent	OnGameFinished;
+	public UnityEvent_Bomb					OnBombExplode;
+	public UnityEngine.Events.UnityEvent	OnPlayerDeathExplode;
+	public UnityEngine.Events.UnityEvent	OnGameFinished;
+	public UnityEngine.Events.UnityEvent	OnTickEnd;
 
 	public PopperMan.Tile this[int x,int y]
 	{
@@ -175,10 +182,12 @@ public class Game : MonoBehaviour {
 
 			bomb.Player.BombCount++;
 			if ( OnBombExplode != null )
-				OnBombExplode.Invoke();
+				OnBombExplode.Invoke(bomb);
 			Bombs.RemoveAt(i);
 		}
 
 		//	kill some players!
+
+		OnTickEnd.Invoke ();
 	}
 }
