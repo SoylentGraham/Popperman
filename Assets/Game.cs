@@ -100,27 +100,72 @@ public class Game : MonoBehaviour {
 		return false;
 	}
 
+	Bomb GetBombAt(int2 xy)
+	{
+		foreach (var Bomb in Bombs) {
+			if (Bomb.xy == xy)
+				return Bomb;
+		}
+		return null;
+	}
+
+	Player GetPlayerAt(int2 xy)
+	{
+		foreach (var Player in Players) {
+			if (Player.xy == xy)
+				return Player;
+		}
+		return null;
+	}
+
+	Popperman.Tile GetMapTileAt(int2 xy)
+	{
+		var map = GameObject.FindObjectOfType<Map>();
+		return map [xy];
+	}
+
 	void PreExplodeBomb(Bomb bomb)
 	{
 		bomb.Duration = 0;
 
-		//	explode all the bombs we reach, make them pre-explode
-		foreach (var OtherBomb in Bombs)
-		{
-			if ( OtherBomb == bomb )
-				continue;
+		System.Func<int2,bool> ProcessExplosionAndContinue = (xy) => {
 
-			//	other already exploded, don't recurse
-			if ( OtherBomb.Duration == 0 )
-				continue;
+			//	explode bomb
+			var HitBomb = GetBombAt (xy);
+			if (HitBomb && HitBomb.Duration != 0) {
+				PreExplodeBomb (HitBomb);
+			}
 
-			//	do we reach it?
-			if ( !WithinDirectionRadius( bomb.xy, OtherBomb.xy, bomb.Radius ) )
-				continue;
+			//	kill any players we hit
+			var HitPlayer = GetPlayerAt (xy);
+			HitPlayer.Kill( bomb.Player );
 
-			//	ownership of bomb changes to instigator
-			OtherBomb.Player = bomb.Player;
-			PreExplodeBomb(OtherBomb);
+			//	check if we're blocked by the map
+			var Tile = GetMapTileAt(xy);
+			if ( Tile == PopperMan.Tile.Solid )
+				return false;
+
+			FlameCoords.Add(xy);
+
+			return true;
+		};
+
+		//	change of logic. walk explosion to detect different objects, halt the blast on solids
+		for (int x = 1;	x <= bomb.Radius;	x++) {
+			if (!ProcessExplosionAndContinue (new int2 (bomb.x + x, bomb.y)))
+				break;
+		}
+		for (int x = 1;	x <= bomb.Radius;	x++) {
+			if (!ProcessExplosionAndContinue (new int2 (bomb.x - x, bomb.y)))
+				break;
+		}
+		for (int y = 1;	y <= bomb.Radius;	y++) {
+			if (!ProcessExplosionAndContinue (new int2 (bomb.x, bomb.y+y)))
+				break;
+		}
+		for (int y = 1;	y <= bomb.Radius;	y++) {
+			if (!ProcessExplosionAndContinue (new int2 (bomb.x, bomb.y-y)))
+				break;
 		}
 
 	}
@@ -152,13 +197,14 @@ public class Game : MonoBehaviour {
 
 		//	update bombs
 		//	decrease all bomb times. if it pre-explodes, pre-explode others
+		var BombFlameCoords = new List<int2>();
 		foreach ( var bomb in Bombs )
 		{
 			bomb.Duration--;
 			if ( bomb.Duration > 0 )
 				continue;
 
-			PreExplodeBomb( bomb );
+			PreExplodeBomb( bomb, BombFlameCoords );
 		}
 
 		var KilledPlayers = new List<Player>();
@@ -171,14 +217,6 @@ public class Game : MonoBehaviour {
 			var bomb = Bombs[i];
 			if ( bomb.Duration > 0 )
 				continue;
-
-			//	did we hit a player?
-			foreach ( var player in Players )
-			{
-				if ( !WithinDirectionRadius( bomb.xy, player.xy, bomb.Radius ) )
-					continue;
-				KilledPlayers.Add( player );
-			}
 
 			bomb.Player.BombCount++;
 			if ( OnBombExplode != null )
