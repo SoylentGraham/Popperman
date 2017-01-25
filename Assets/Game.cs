@@ -6,6 +6,9 @@ using UnityEngine;
 [System.Serializable]
 public class UnityEvent_Bomb : UnityEngine.Events.UnityEvent <Game.Bomb> {}
 
+[System.Serializable]
+public class UnityEvent_Player : UnityEngine.Events.UnityEvent <Player> {}
+
 
 
 public class Game : MonoBehaviour {
@@ -48,7 +51,8 @@ public class Game : MonoBehaviour {
 
 	[Header("Game events - eg sound")]
 	public UnityEvent_Bomb					OnBombExplode;
-	public UnityEngine.Events.UnityEvent	OnPlayerDeathExplode;
+	public UnityEvent_Player				OnPlayerDeathExplode;
+	public UnityEvent_Player				OnPlayerJoin;
 	public UnityEngine.Events.UnityEvent	OnGameFinished;
 	public UnityEngine.Events.UnityEvent	OnTickEnd;
 
@@ -150,8 +154,11 @@ public class Game : MonoBehaviour {
 
 			//	kill any players we hit
 			var HitPlayer = GetPlayerAt (xy);
-			KillPlayer( HitPlayer, bomb );
-			
+			if ( HitPlayer )
+			{
+				KillPlayer( HitPlayer, bomb );
+			}
+
 			//	check if we're blocked by the map
 			var Tile = GetMapTileAt(xy);
 			if ( Tile == PopperMan.Tile.Solid )
@@ -184,6 +191,23 @@ public class Game : MonoBehaviour {
 
 	}
 
+	bool CanPlayerMoveTo(int2 xy)
+	{
+		var map = GameObject.FindObjectOfType<Map>();
+
+		if ( GetBombAt(xy) != null )
+			return false;
+
+		if ( GetPlayerAt(xy) )
+			return false;
+
+		var MapTile = map[xy];
+		if ( MapTile != PopperMan.Tile.Empty )
+			return false;
+
+		return true;
+	}
+
 	public void Tick()
 	{
 		Frame++;
@@ -203,14 +227,29 @@ public class Game : MonoBehaviour {
 				bomb.Radius = player.BombRadius;
 				Bombs.Add( bomb );
 			};
+			
+			if ( !player.Alive )
+			{
+				if ( player.Input_JoinGame )
+				{
+					//	todo: be clever at placing them
+					player.Alive = true;
+					OnPlayerJoin.Invoke(player);
+				}
+			}
+			else
+			{
+				player.PlaceBomb(map,this,OnPlaceBomb);
+				player.Move( CanPlayerMoveTo );
+			}
 
-			player.PlaceBomb(map,this,OnPlaceBomb);
-			player.Move(map);
 			player.ClearInput ();
 		}
 
 		System.Action<Player, Bomb> KillPlayer = (p, b) =>
 		{
+			p.Alive = false;
+			OnPlayerDeathExplode.Invoke(p);
 		};
 
 		//	update bombs
@@ -241,7 +280,7 @@ public class Game : MonoBehaviour {
 			Bombs.RemoveAt(i);
 		}
 
-		//	kill some players!
+		//	kill some players! end the game etc
 
 		OnTickEnd.Invoke ();
 	}

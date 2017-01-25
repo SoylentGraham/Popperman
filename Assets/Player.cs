@@ -15,6 +15,7 @@ public class Player : MonoBehaviour {
 
 	public PopperMan.Direction	Input_Direction = PopperMan.Direction.None;
 	public bool					Input_Bomb = false;
+	public bool					Input_JoinGame = false;
 
 	[Range(0,20)]
 	public int		x = 1;
@@ -37,6 +38,8 @@ public class Player : MonoBehaviour {
 	public int		BombDuration = 10;
 	[Range(1,10)]
 	public int		BombRadius = 2;
+
+	public bool		Alive = false;
 
 	[Header("Gameplay sounds etc")]
 	public UnityEngine.Events.UnityEvent	OnBump;
@@ -68,6 +71,7 @@ public class Player : MonoBehaviour {
 	{
 		Input_Direction = PopperMan.Direction.None;
 		Input_Bomb = false;
+		Input_JoinGame = false;
 	}
 
 	void Update()
@@ -79,6 +83,7 @@ public class Player : MonoBehaviour {
 		SetDirectionIfKey( PopperMan.Direction.Right, PopperMan.NesPadJoystickButton.Right );
 
 		Input_Bomb |= Input.GetKeyDown (PopperMan.GetJoystickButtonName (JoystickIndex, this[PopperMan.NesPadJoystickButton.A] ));
+		Input_JoinGame |= Input.GetKeyDown (PopperMan.GetJoystickButtonName (JoystickIndex, this[PopperMan.NesPadJoystickButton.Select] ));
 
 		if ( EnableKeyboardInput ) 
 		{
@@ -88,17 +93,17 @@ public class Player : MonoBehaviour {
 			SetDirectionIfKey( PopperMan.Direction.Right, KeyCode.RightArrow );
 
 			Input_Bomb |= Input.GetKeyDown (KeyCode.Space);
+			Input_JoinGame |= Input.GetKeyDown (KeyCode.Return);
 		}
 	}
 
-	public void Move(Map map)
+	public void Move(System.Func<int2,bool> CanMoveTo)
 	{
 		if ( Input_Direction == PopperMan.Direction.None )
 			return;
 
 		var NewPos = PopperMan.Move( new int2(x,y), Input_Direction );
-		var NewTile = map[NewPos];
-		if ( NewTile != PopperMan.Tile.Empty )
+		if ( !CanMoveTo( NewPos ) )
 		{
 			OnBump.Invoke();
 			return;
