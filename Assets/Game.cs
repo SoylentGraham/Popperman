@@ -99,7 +99,7 @@ public class Game : MonoBehaviour {
 
 		return false;
 	}
-
+	/*
 	Bomb GetBombAt(int2 xy)
 	{
 		foreach (var Bomb in Bombs) {
@@ -118,14 +118,16 @@ public class Game : MonoBehaviour {
 		return null;
 	}
 
+
 	Popperman.Tile GetMapTileAt(int2 xy)
 	{
 		var map = GameObject.FindObjectOfType<Map>();
 		return map [xy];
 	}
-
+*/
 	void PreExplodeBomb(Bomb bomb)
 	{
+		/*
 		bomb.Duration = 0;
 
 		System.Func<int2,bool> ProcessExplosionAndContinue = (xy) => {
@@ -145,7 +147,7 @@ public class Game : MonoBehaviour {
 			if ( Tile == PopperMan.Tile.Solid )
 				return false;
 
-			FlameCoords.Add(xy);
+			bomb.Flames.Add(xy);
 
 			return true;
 		};
@@ -167,7 +169,7 @@ public class Game : MonoBehaviour {
 			if (!ProcessExplosionAndContinue (new int2 (bomb.x, bomb.y-y)))
 				break;
 		}
-
+*/
 	}
 
 	public void Tick()
@@ -197,14 +199,13 @@ public class Game : MonoBehaviour {
 
 		//	update bombs
 		//	decrease all bomb times. if it pre-explodes, pre-explode others
-		var BombFlameCoords = new List<int2>();
 		foreach ( var bomb in Bombs )
 		{
 			bomb.Duration--;
 			if ( bomb.Duration > 0 )
 				continue;
 
-			PreExplodeBomb( bomb, BombFlameCoords );
+			PreExplodeBomb( bomb );
 		}
 
 		var KilledPlayers = new List<Player>();

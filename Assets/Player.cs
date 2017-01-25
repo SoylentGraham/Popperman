@@ -7,6 +7,10 @@ using UnityEngine;
 public class Player : MonoBehaviour {
 
 	public int		JoystickIndex = 0;
+	public int		JoystickButton_First = 0;
+
+	public int		this[PopperMan.NesPadJoystickButton Button]	{	get { return JoystickButton_First + (int)Button; }	}
+
 	public bool		EnableKeyboardInput = true;
 
 	public PopperMan.Direction	Input_Direction = PopperMan.Direction.None;
@@ -41,9 +45,9 @@ public class Player : MonoBehaviour {
 	public UnityEngine.Events.UnityEvent	OnPlayerMoved;
 
 
-	void SetDirectionIfKey(PopperMan.Direction Direction,PopperMan.NesPadJoystickButton KeyName)
+	void SetDirectionIfKey(PopperMan.Direction Direction,PopperMan.NesPadJoystickButton Button)
 	{
-		SetDirectionIfKey (Direction, PopperMan.GetJoystickButtonName (JoystickIndex, KeyName));
+		SetDirectionIfKey (Direction, PopperMan.GetJoystickButtonName (JoystickIndex, this[Button] ));
 	}
 
 	void SetDirectionIfKey(PopperMan.Direction Direction,string KeyName)
@@ -70,11 +74,11 @@ public class Player : MonoBehaviour {
 	{
 		//	we OR the inputs, as they're only used on a tick, we store it until
 		SetDirectionIfKey( PopperMan.Direction.Up, PopperMan.NesPadJoystickButton.Up );
-		SetDirectionIfKey( PopperMan.Direction.Up, PopperMan.NesPadJoystickButton.Up );
-		SetDirectionIfKey( PopperMan.Direction.Up, PopperMan.NesPadJoystickButton.Up );
-		SetDirectionIfKey( PopperMan.Direction.Up, PopperMan.NesPadJoystickButton.Up );
+		SetDirectionIfKey( PopperMan.Direction.Down, PopperMan.NesPadJoystickButton.Down );
+		SetDirectionIfKey( PopperMan.Direction.Left, PopperMan.NesPadJoystickButton.Left );
+		SetDirectionIfKey( PopperMan.Direction.Right, PopperMan.NesPadJoystickButton.Right );
 
-		Input_Bomb |= Input.GetKey (PopperMan.GetJoystickButtonName (JoystickIndex, PopperMan.NesPadJoystickButton.A));
+		Input_Bomb |= Input.GetKeyDown (PopperMan.GetJoystickButtonName (JoystickIndex, this[PopperMan.NesPadJoystickButton.A] ));
 
 		if ( EnableKeyboardInput ) 
 		{
@@ -83,7 +87,7 @@ public class Player : MonoBehaviour {
 			SetDirectionIfKey( PopperMan.Direction.Left, KeyCode.LeftArrow );
 			SetDirectionIfKey( PopperMan.Direction.Right, KeyCode.RightArrow );
 
-			Input_Bomb |= Input.GetKey (KeyCode.Space);
+			Input_Bomb |= Input.GetKeyDown (KeyCode.Space);
 		}
 	}
 
