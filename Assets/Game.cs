@@ -12,16 +12,22 @@ public class Game : MonoBehaviour {
 
 	public class Bomb
 	{
+		public int		x {	get {return xy.x; } }
+		public int		y {	get {return xy.y; } }
 		public int2		xy;
 		public int		StartFrame;
 		public int		Duration;
 		public Player	Player;
 		public int		Radius;
+
+		//	store flames upon explosion for anim
+		public List<int2>	Flames = new List<int2>();
 	};
 
 	[InspectorButton("Tick")]
 	public bool	_Tick;
 	int Frame = 0;
+
 
 	[Range(1,60)]
 	public int		TicksPerSec = 5;
@@ -99,7 +105,7 @@ public class Game : MonoBehaviour {
 
 		return false;
 	}
-	/*
+	
 	Bomb GetBombAt(int2 xy)
 	{
 		foreach (var Bomb in Bombs) {
@@ -119,29 +125,33 @@ public class Game : MonoBehaviour {
 	}
 
 
-	Popperman.Tile GetMapTileAt(int2 xy)
+	PopperMan.Tile GetMapTileAt(int2 xy)
 	{
 		var map = GameObject.FindObjectOfType<Map>();
 		return map [xy];
 	}
-*/
-	void PreExplodeBomb(Bomb bomb)
+
+	void PreExplodeBomb(Bomb bomb,System.Action<Player,Bomb> KillPlayer)
 	{
-		/*
 		bomb.Duration = 0;
 
-		System.Func<int2,bool> ProcessExplosionAndContinue = (xy) => {
-
+		System.Func<int2,bool> ProcessExplosionAndContinue = (xy) =>
+		{
 			//	explode bomb
 			var HitBomb = GetBombAt (xy);
-			if (HitBomb && HitBomb.Duration != 0) {
-				PreExplodeBomb (HitBomb);
+			if ( HitBomb!=null )
+			{
+				//	not already exploded (stop recursion)
+				if ( HitBomb.Duration != 0)
+				{
+					PreExplodeBomb (HitBomb, KillPlayer);
+				}
 			}
 
 			//	kill any players we hit
 			var HitPlayer = GetPlayerAt (xy);
-			HitPlayer.Kill( bomb.Player );
-
+			KillPlayer( HitPlayer, bomb );
+			
 			//	check if we're blocked by the map
 			var Tile = GetMapTileAt(xy);
 			if ( Tile == PopperMan.Tile.Solid )
@@ -151,6 +161,8 @@ public class Game : MonoBehaviour {
 
 			return true;
 		};
+
+		bomb.Flames.Add(bomb.xy);
 
 		//	change of logic. walk explosion to detect different objects, halt the blast on solids
 		for (int x = 1;	x <= bomb.Radius;	x++) {
@@ -169,7 +181,7 @@ public class Game : MonoBehaviour {
 			if (!ProcessExplosionAndContinue (new int2 (bomb.x, bomb.y-y)))
 				break;
 		}
-*/
+
 	}
 
 	public void Tick()
@@ -197,6 +209,10 @@ public class Game : MonoBehaviour {
 			player.ClearInput ();
 		}
 
+		System.Action<Player, Bomb> KillPlayer = (p, b) =>
+		{
+		};
+
 		//	update bombs
 		//	decrease all bomb times. if it pre-explodes, pre-explode others
 		foreach ( var bomb in Bombs )
@@ -205,7 +221,7 @@ public class Game : MonoBehaviour {
 			if ( bomb.Duration > 0 )
 				continue;
 
-			PreExplodeBomb( bomb );
+			PreExplodeBomb( bomb, KillPlayer );
 		}
 
 		var KilledPlayers = new List<Player>();

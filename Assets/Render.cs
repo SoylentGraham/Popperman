@@ -28,28 +28,17 @@ public class Render : MonoBehaviour {
 
 	public void AddBombExplodeAnim(Game.Bomb Bomb)
 	{
-		System.Action<int,int> MakeBombAnim = (x,y) => {
+		System.Action<int2> MakeBombAnim = (xy) => {
 			var Anim = new TickAnimation ();
-			Anim.xy = new int2(x,y);
+			Anim.xy = xy;
 			Anim.Tile = PopperMan.Tile.Flame;
 			Anim.Duration = 2;
 			Animations.Add( Anim );
 		};
 
-		MakeBombAnim (Bomb.xy.x, Bomb.xy.y);
-
-		for ( int x=-Bomb.Radius;	x<=Bomb.Radius;	x++ )
+		foreach (var FlamePos in Bomb.Flames)
 		{
-			if (x == 0)
-				continue;
-			MakeBombAnim( Bomb.xy.x + x, Bomb.xy.y );
-		}
-
-		for ( int y=-Bomb.Radius;	y<=Bomb.Radius;	y++ )
-		{
-			if (y == 0)
-				continue;
-			MakeBombAnim( Bomb.xy.x, Bomb.xy.y+y );
+			MakeBombAnim ( FlamePos );
 		}
 
 	}
