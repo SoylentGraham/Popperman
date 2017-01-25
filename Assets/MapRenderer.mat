@@ -30,7 +30,7 @@ Material:
       second: 1
     - first:
         name: Height
-      second: 18
+      second: 17
     - first:
         name: PlayerRadius
       second: 0.725

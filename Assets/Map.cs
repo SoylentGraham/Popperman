@@ -16,7 +16,31 @@ public class Map : MonoBehaviour {
 	[InspectorButton("ResetMap")]
 	public bool		_ResetMap;
 
-	public List<PopperMan.Tile>	Tiles;
+	[InspectorButton("MapChanged")]
+	public bool		_MapChanged;
+
+	[Multiline(20)]
+	public string	TilesAsNumbers = "00000000000";
+
+	public List<PopperMan.Tile> Tiles
+	{
+		get
+		{
+			var TheTiles = new List<PopperMan.Tile>();
+			foreach ( var TileChar in TilesAsNumbers )
+			{
+				if ( TileChar < '0' || TileChar > '9' )
+					continue;
+
+				var TileValue = (int)TileChar - '0';
+				var Tile = (PopperMan.Tile)TileValue;
+				TheTiles.Add( Tile );
+			}
+			return TheTiles;
+		}
+
+	}
+
 	
 	public UnityEvent		OnMapChanged;
 
@@ -60,6 +84,24 @@ public class Map : MonoBehaviour {
 
 	public void ResetMap()
 	{
+		var CurrentTiles = Tiles;
+		var Size = Width*Height;
+
+		while ( CurrentTiles.Count < Size )
+			CurrentTiles.Add( PopperMan.Tile.Floor );
+
+		TilesAsNumbers = "";
+		for (int i = 0; i < Size; i++)
+		{
+			char Char = '0';
+			Char += (char)CurrentTiles[i];
+			TilesAsNumbers += Char;
+			if ( (i % Width) == (Width-1) )
+				TilesAsNumbers += '\n';
+		}
+
+
+		/*
 		Tiles = new List<PopperMan.Tile>();
 		for (int i = 0; i < Width * Height; i++)
 		{
@@ -73,9 +115,16 @@ public class Map : MonoBehaviour {
 
 			Tiles.Add( Tile );
 		}
-
+		*/
 		OnMapChanged.Invoke();
 	}
+
+
+	void MapChanged()
+	{
+		OnMapChanged.Invoke();
+	}
+
 
 
 
