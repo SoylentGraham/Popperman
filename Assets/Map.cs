@@ -63,7 +63,7 @@ public class Map : MonoBehaviour {
 		Tiles = new List<PopperMan.Tile>();
 		for (int i = 0; i < Width * Height; i++)
 		{
-			var Tile = PopperMan.Tile.Empty;
+			var Tile = PopperMan.Tile.Floor;
 			var xy = GetMapXy( i );
 			var x = xy.x;
 			var y = xy.y;

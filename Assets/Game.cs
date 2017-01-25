@@ -55,37 +55,9 @@ public class Game : MonoBehaviour {
 	public UnityEvent_Player				OnPlayerJoin;
 	public UnityEngine.Events.UnityEvent	OnGameFinished;
 	public UnityEngine.Events.UnityEvent	OnTickEnd;
+	
 
-	public PopperMan.Tile this[int x,int y]
-	{
-		get
-		{
-			return GetTile(new int2(x,y));
-		}
-	}
-
-	//	gr: this can return multiple things for a tile (player, bomb), handle this
-	public PopperMan.Tile GetTile(int2 xy)
-	{
-		//	check for a bomb
-		foreach ( var bomb in Bombs )
-		{
-			if ( bomb.xy == xy )
-				return PopperMan.Tile.Bomb;
-		}
-
-		//	see if there's a player here
-		foreach ( var player in Players )
-		{
-			if ( player.xy == xy )
-				return PopperMan.Tile.Player;
-		}
-
-		var map = GameObject.FindObjectOfType<Map>();
-		return map[xy];
-	}
-
-
+	
 	private void Update()
 	{
 		TickCountdown -= Time.deltaTime;
@@ -110,7 +82,7 @@ public class Game : MonoBehaviour {
 		return false;
 	}
 	
-	Bomb GetBombAt(int2 xy)
+	public Bomb GetBombAt(int2 xy)
 	{
 		foreach (var Bomb in Bombs) {
 			if (Bomb.xy == xy)
@@ -119,7 +91,7 @@ public class Game : MonoBehaviour {
 		return null;
 	}
 
-	Player GetPlayerAt(int2 xy)
+	public Player GetPlayerAt(int2 xy)
 	{
 		foreach (var Player in Players) {
 			if (Player.xy == xy)
@@ -202,11 +174,30 @@ public class Game : MonoBehaviour {
 			return false;
 
 		var MapTile = map[xy];
-		if ( MapTile != PopperMan.Tile.Empty )
+		if ( MapTile != PopperMan.Tile.Floor )
 			return false;
 
 		return true;
 	}
+
+	bool CanPlaceBombAt(int2 xy,Player Placer)
+	{
+		var map = GameObject.FindObjectOfType<Map>();
+
+		if ( GetBombAt(xy) != null )
+			return false;
+
+		var Player = GetPlayerAt(xy);
+		if ( Player && Player != Placer )
+			return false;
+
+		var MapTile = map[xy];
+		if ( MapTile != PopperMan.Tile.Floor )
+			return false;
+
+		return true;
+	}
+
 
 	public void Tick()
 	{
@@ -239,7 +230,7 @@ public class Game : MonoBehaviour {
 			}
 			else
 			{
-				player.PlaceBomb(map,this,OnPlaceBomb);
+				player.PlaceBomb(map,this,CanPlaceBombAt,OnPlaceBomb);
 				player.Move( CanPlayerMoveTo );
 			}
 

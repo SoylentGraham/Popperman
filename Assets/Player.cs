@@ -115,7 +115,7 @@ public class Player : MonoBehaviour {
 	}
 
 
-	public void PlaceBomb(Map map,Game game,System.Action<int2> PlaceBomb)
+	public void PlaceBomb(Map map,Game game,System.Func<int2,Player,bool> CanPlaceBombAt,System.Action<int2> PlaceBomb)
 	{
 		if ( !Input_Bomb )
 			return;
@@ -126,20 +126,14 @@ public class Player : MonoBehaviour {
 			return;
 		}
 
-		var Tile = game[x,y];
-		switch ( Tile )
+		if ( !CanPlaceBombAt(xy,this) )
 		{
-			//	assuming player must be us.. maybe double check that
-			case PopperMan.Tile.Empty:
-			case PopperMan.Tile.Player:
-				break;
-			default:
-				OnPlaceBombFailed.Invoke();
-				return;
+			OnPlaceBombFailed.Invoke();
+			return;
 		}
 
 		//	place bomb!
-		PlaceBomb.Invoke(xy);
+		PlaceBomb(xy);
 		BombCount--;
 		Input_Bomb = false;
 		OnPlaceBomb.Invoke();

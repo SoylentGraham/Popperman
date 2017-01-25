@@ -4,23 +4,37 @@ using UnityEngine;
 
 
 
-
 public class PopperMan
 {
+	//	same as shader
+	const int TILE_INVALID	= -1;
+	const int TILE_NONE		= 0;
+	const int TILE_FLOOR	= 1;
+	const int TILE_SOLID	= 2;
+	const int TILE_WALL		= 3;
+	const int TILE_BOMB		= 4;
+	const int TILE_PLAYER	= 5;
+	const int TILE_GHOST	= 6;
+	const int TILE_FLAME	= 7;
+
+
 	public enum Tile
 	{
 		//	map tiles
-		Empty,
-		Solid,
-		Wall,
+		Floor		= TILE_FLOOR,
+		Solid		= TILE_SOLID,
+		Wall		= TILE_WALL,
 
 		//	meta tiles
-		OutOfBounds,
+		OutOfBounds	= TILE_INVALID,
+		Invalid		= TILE_INVALID,
+		None		= TILE_NONE,
 
 		//	game tiles
-		Bomb,
-		Player,
-		Flame,
+		Bomb		= TILE_BOMB,
+		Player		= TILE_PLAYER,
+		Ghost		= TILE_GHOST,
+		Flame		= TILE_FLAME,
 	}
 
 	public enum Direction

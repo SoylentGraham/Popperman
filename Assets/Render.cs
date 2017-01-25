@@ -67,22 +67,41 @@ public class Render : MonoBehaviour {
 		MapShader.SetInt("Width", map.Width );
 		MapShader.SetInt("Height", map.Height );
 		
-		var Tiles = new List<float>();
+		var MapTiles = new List<float>();
+		var GameTiles = new List<float>();
+		var AnimTiles = new List<float>();
+
 		for ( int i=0;	i<map.Width*map.Height;	i++ )
 		{
 			var xy = map.GetMapXy(i);
-			var Tile = game.GetTile(xy);
+			var MapTile = map[xy];
+			var GameTile = PopperMan.Tile.None;
+			var AnimTile = PopperMan.Tile.None;
 
 			//	check for anims
 			foreach (var Anim in Animations) {
 				if (Anim.xy != xy)
 					continue;
-				Tile = Anim.Tile;
+				AnimTile = Anim.Tile;
 			}
 
-			Tiles.Add( (float)Tile );
+			if ( game.GetBombAt(xy) != null )
+				GameTile = PopperMan.Tile.Bomb;
+
+			{
+				var Player = game.GetPlayerAt(xy);
+				if ( Player )
+					GameTile = Player.Alive ? PopperMan.Tile.Player : PopperMan.Tile.Ghost;
+			}
+
+			MapTiles.Add( (float)MapTile );
+			GameTiles.Add( (float)GameTile );
+			AnimTiles.Add( (float)AnimTile );
 		}
-		MapShader.SetFloatArray("Tiles", Tiles );
+
+		MapShader.SetFloatArray("MapTiles", MapTiles );
+		MapShader.SetFloatArray("GameTiles", GameTiles );
+		MapShader.SetFloatArray("AnimTiles", AnimTiles );
 
 		UnityEditor.SceneView.RepaintAll();
 	}

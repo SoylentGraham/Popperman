@@ -23,8 +23,17 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - first:
+        name: BombRadius
+      second: 0.6
+    - first:
+        name: FlameRadius
+      second: 1
+    - first:
         name: Height
       second: 18
+    - first:
+        name: PlayerRadius
+      second: 0.725
     - first:
         name: Width
       second: 20
@@ -32,6 +41,27 @@ Material:
     - first:
         name: TileBomb
       second: {r: 0, g: 0, b: 0, a: 1}
+    - first:
+        name: TileColour_Bomb
+      second: {r: 0, g: 0, b: 0, a: 1}
+    - first:
+        name: TileColour_Flame
+      second: {r: 1, g: 0.3, b: 0, a: 1}
+    - first:
+        name: TileColour_Floor
+      second: {r: 0, g: 1, b: 0, a: 1}
+    - first:
+        name: TileColour_Ghost
+      second: {r: 0.5693123, g: 0.5693123, b: 0.99264705, a: 0.497}
+    - first:
+        name: TileColour_Player
+      second: {r: 0, g: 0, b: 1, a: 1}
+    - first:
+        name: TileColour_Solid
+      second: {r: 1, g: 1, b: 1, a: 1}
+    - first:
+        name: TileColour_Wall
+      second: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - first:
         name: TileEmpty
       second: {r: 0.5692564, g: 0.77205884, b: 0.3746756, a: 1}
