@@ -52,6 +52,24 @@ public class PopperMan
 		return xy;
 	}
 
+	public enum NesPadJoystickButton
+	{
+		Up = 0,
+		Down = 1,
+		Left = 2,
+		Right = 3,
+		A = 4,
+		B = 5,
+		Start = 6,
+		Select = 7,
+	};
+
+	static public string GetJoystickButtonName(int Joystick,NesPadJoystickButton Button)
+	{
+		return "joystick " + (Joystick+1) + " button " + (int)Button;
+	}
+
+
 }
 
 

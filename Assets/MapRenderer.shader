@@ -52,7 +52,9 @@
 		#define MAX_HEIGHT	20
 			int Width;
 			int Height;
-			int Tiles[MAX_WIDTH*MAX_HEIGHT];
+
+			//	gr: on OSX int Tiles[] renders everything as 0 or <invalid>
+			float Tiles[MAX_WIDTH*MAX_HEIGHT];
 
 			
 			v2f vert (appdata v)

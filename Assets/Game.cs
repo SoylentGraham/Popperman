@@ -140,6 +140,7 @@ public class Game : MonoBehaviour {
 
 			player.PlaceBomb(map,this,OnPlaceBomb);
 			player.Move(map);
+			player.ClearInput ();
 		}
 
 		//	update bombs
