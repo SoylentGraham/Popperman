@@ -234,7 +234,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: A
+  Ident: '!'
   x: 12
   y: 5
   BombCount: 3
@@ -1203,7 +1203,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: I
+  Ident: R
   x: 18
   y: 1
   BombCount: 3
@@ -1299,7 +1299,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: F
+  Ident: 6
   x: 7
   y: 5
   BombCount: 3
@@ -1739,7 +1739,7 @@ MonoBehaviour:
   Height: 17
   _ResetMap: 0
   _MapChanged: 0
-  TilesAsNumbers: "22222222222222222222\r\n21111111111111111112\r\n21212121211212121212\r\n21111111111111111112\r\n21212121211212121212\r\n21111111111111111112\r\n21212121211212121212\r\n21111111111111111112\r\n21212121211212121212\r\n21111111111111111112\r\n21212121211212121212\r\n21111111111111111112\r\n21212121211212121212\r\n21111111111111111112\r\n21212121211212121212\r\n21111111111111111112\r\n22222222222222222222"
+  TilesAsNumbers: "22222222222222222222\r\n21131333333333313112\r\n21212123211232121212\r\n23133333333333333132\r\n21232321233212323212\r\n23331311133111313332\r\n23232321233212323232\r\n23331333333333313332\r\n23232323233232323232\r\n23331333333333313332\r\n23232321233212323232\r\n23331311133111313332\r\n21232321233212323212\r\n23133333333333333332\r\n21212123211232121212\r\n21131333333333313112\r\n22222222222222222222"
   OnMapChanged:
     m_PersistentCalls:
       m_Calls:
@@ -1768,7 +1768,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _Tick: 0
-  TicksPerSec: 29
+  TicksPerSec: 6
   _Players:
   - {fileID: 1021127078}
   - {fileID: 64925821}
@@ -1937,7 +1937,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: T
+  Ident: M
   x: 1
   y: 15
   BombCount: 3
@@ -2033,7 +2033,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: R
+  Ident: G
   x: 7
   y: 11
   BombCount: 3
@@ -2129,7 +2129,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: M
+  Ident: V
   x: 18
   y: 15
   BombCount: 3
@@ -2334,7 +2334,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: W
+  Ident: G
   x: 1
   y: 1
   BombCount: 3
