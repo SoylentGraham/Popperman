@@ -13,9 +13,11 @@
 		TileColour_Player("TileColour_Player",COLOR) = (0,0,1,1)
 		TileColour_Ghost("TileColour_Ghost",COLOR) = (0,0,1,0.4)
 		TileColour_Flame("TileColour_Flame",COLOR) = (1,0.3,0,1)
+		TileColour_Ident("TileColour_Ident",COLOR) = (1,1,1,1)
 
 		FloorColourMult("FloorColourMult", COLOR ) = (0.1,1,1,1)
 		ForcedAlpha("ForcedAlpha", Range(0.5,1) ) = 1
+		IdentDropShadowOffset("IdentDropShadowOffset", range(0,0.10) ) = 0.05
 
 		BombRadius("BombRadius", Range(0,1) ) = 0.6
 		PlayerRadius("PlayerRadius", Range(0,1) ) = 0.8
@@ -87,6 +89,8 @@
 			float4 TileColour_Flame;
 			float ForcedAlpha;
 			float3 FloorColourMult;
+			float4 TileColour_Ident;
+			float IdentDropShadowOffset;
 
 			float BombRadius;
 			float PlayerRadius;
@@ -131,29 +135,54 @@
 					return float4( Colour.xyz, 0 );
 			}
 
-			float4 GetPlayerGlyph(int Player,float2 uv,float Radius,float4 Colour)
+			float GetGlyphAlpha(int Player,float2 uv,float Scale)
 			{
-				Colour = GetCircle( uv, Radius, Colour );
-
 				//	add the font too
 				uv.x = 1-uv.x;
 
 				float GlyphScale = 1 / GlyphRadius;
-				float Step = (1/Radius) * GlyphScale;
+				float Step = (1/Scale) * GlyphScale;
 
 				float2 Glyphuv = uv;
 				Glyphuv -= 0.5f;
 				Glyphuv *= Step;
 				Glyphuv += 0.5f;
 				Glyphuv = min( 1, max(0,Glyphuv));
-				
+
 				float u = lerp( IdentUvs[Player].x, IdentUvs[Player].z, 1-Glyphuv.x );
 				float v = lerp( IdentUvs[Player].y, IdentUvs[Player].w, Glyphuv.y );
 				float4 Glyph = tex2D( IdentTexture, float2(u,v) );
+				return Glyph.a;
+			}
+
+			float4 GetPlayerGlyph(int Player,float2 uv,float Radius,float4 Colour)
+			{
+				Colour = GetCircle( uv, Radius, Colour );
+
+				
+				float Glyph = GetGlyphAlpha( Player, uv, Radius );
+				float GlyphShadow = GetGlyphAlpha( Player, uv-IdentDropShadowOffset, Radius );
 
 				//Colour.xyz = lerp( Colour, float3(1,1,1), Glyph.a );
 				//Colour.a = max( Colour.x, Glyph.a );
-				Colour.a *= 1 - Glyph.a;
+
+				//	colour
+				if ( TileColour_Ident.a > 0 )
+				{
+					if ( GlyphShadow > Glyph )
+						Colour.xyz = lerp( Colour, float3(0,0,0), GlyphShadow );
+
+					Colour.xyz = lerp( Colour, TileColour_Ident, Glyph );
+					Colour.a += Glyph;
+
+					
+				}
+				else
+				{
+					//	hole
+					Colour.a *= 1 - Glyph;
+				}
+
 				//Colour += Glyph;
 				//if ( Glyph.a > 0.5f )
 				{

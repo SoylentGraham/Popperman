@@ -53,6 +53,9 @@ Material:
         name: Height
       second: 17
     - first:
+        name: IdentDropShadowOffset
+      second: 0.0536
+    - first:
         name: PlayerRadius
       second: 0.707
     - first:
@@ -78,8 +81,11 @@ Material:
         name: TileColour_Ghost
       second: {r: 0.5693123, g: 0.5693123, b: 0.99264705, a: 0.497}
     - first:
+        name: TileColour_Ident
+      second: {r: 1, g: 1, b: 1, a: 1}
+    - first:
         name: TileColour_Player
-      second: {r: 0, g: 0, b: 1, a: 1}
+      second: {r: 0.8308824, g: 0.7752656, b: 0.02443774, a: 1}
     - first:
         name: TileColour_Solid
       second: {r: 1, g: 1, b: 1, a: 1}
