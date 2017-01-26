@@ -21,6 +21,7 @@ public class Player : MonoBehaviour {
 	public bool		EnableKeyboardInput = true;
 
 	public PopperMan.Direction	Input_Direction = PopperMan.Direction.None;
+	PopperMan.Direction			TickStart_Direction = PopperMan.Direction.None;
 	public bool					Input_Bomb = false;
 	public bool					Input_JoinGame = false;
 	public bool					Input_ChangeIdent = false;
@@ -67,18 +68,19 @@ public class Player : MonoBehaviour {
 	}
 
 
-	void SetDirectionIfKey(PopperMan.Direction Direction,PopperMan.NesPadJoystickButton Button)
+	bool SetDirectionIfKey(PopperMan.Direction Direction,PopperMan.NesPadJoystickButton Button)
 	{
-		SetDirectionIfKey (Direction, Pop.GetJoystickButtonName (JoystickIndex, this[Button] ));
+		return SetDirectionIfKey (Direction, Pop.GetJoystickButtonName (JoystickIndex, this[Button] ));
 	}
 
-	void SetDirectionIfKey(PopperMan.Direction Direction,string KeyName)
+	bool SetDirectionIfKey(PopperMan.Direction Direction,string KeyName)
 	{
 		if (!Input.GetKey (KeyName))
-			return;
+			return false;
 		Input_Direction = Direction;
+		return true;
 	}
-
+	
 	void SetDirectionIfKey(PopperMan.Direction Direction,KeyCode KeyName)
 	{
 		if (!Input.GetKey (KeyName))
@@ -91,6 +93,16 @@ public class Player : MonoBehaviour {
 		Input_Direction = PopperMan.Direction.None;
 		Input_Bomb = false;
 		Input_JoinGame = false;
+
+
+		//	work out if we let-go in a frame
+		Input_Direction = PopperMan.Direction.None;
+		SetDirectionIfKey( PopperMan.Direction.Up, PopperMan.NesPadJoystickButton.Up );
+		SetDirectionIfKey( PopperMan.Direction.Down, PopperMan.NesPadJoystickButton.Down );
+		SetDirectionIfKey( PopperMan.Direction.Left, PopperMan.NesPadJoystickButton.Left );
+		SetDirectionIfKey( PopperMan.Direction.Right, PopperMan.NesPadJoystickButton.Right );
+		TickStart_Direction = Input_Direction;
+		Input_Direction = PopperMan.Direction.None;
 	}
 
 	void Start()
@@ -102,10 +114,20 @@ public class Player : MonoBehaviour {
 	void Update()
 	{
 		//	we OR the inputs, as they're only used on a tick, we store it until
-		SetDirectionIfKey( PopperMan.Direction.Up, PopperMan.NesPadJoystickButton.Up );
-		SetDirectionIfKey( PopperMan.Direction.Down, PopperMan.NesPadJoystickButton.Down );
-		SetDirectionIfKey( PopperMan.Direction.Left, PopperMan.NesPadJoystickButton.Left );
-		SetDirectionIfKey( PopperMan.Direction.Right, PopperMan.NesPadJoystickButton.Right );
+		bool AnyDown = false;
+		AnyDown |= SetDirectionIfKey( PopperMan.Direction.Up, PopperMan.NesPadJoystickButton.Up );
+		AnyDown |= SetDirectionIfKey( PopperMan.Direction.Down, PopperMan.NesPadJoystickButton.Down );
+		AnyDown |= SetDirectionIfKey( PopperMan.Direction.Left, PopperMan.NesPadJoystickButton.Left );
+		AnyDown |= SetDirectionIfKey( PopperMan.Direction.Right, PopperMan.NesPadJoystickButton.Right );
+
+		//	gr: feels like it gets stuck, if player lets go, then cancel direction
+		if  ( !AnyDown )
+		{
+			//	let go of direction if we were holding it down at the start of the tick
+			//	this allows a tap (above) and a release (this)
+			if ( TickStart_Direction == Input_Direction )
+				Input_Direction = PopperMan.Direction.None;
+		}
 
 		Input_Bomb |= Input.GetKeyDown (Pop.GetJoystickButtonName (JoystickIndex, this[PopperMan.NesPadJoystickButton.A] ));
 		Input_JoinGame |= Input.GetKeyDown (Pop.GetJoystickButtonName (JoystickIndex, this[PopperMan.NesPadJoystickButton.Start] ));
@@ -129,13 +151,13 @@ public class Player : MonoBehaviour {
 		}
 	}
 
-	public void Move(System.Func<int2,bool> CanMoveTo)
+	public void Move(System.Func<int2,bool,Player,bool> CanMoveTo)
 	{
 		if ( Input_Direction == PopperMan.Direction.None )
 			return;
 
 		var NewPos = PopperMan.Move( new int2(x,y), Input_Direction );
-		if ( !CanMoveTo( NewPos ) )
+		if ( !CanMoveTo( NewPos, this.Alive, this ) )
 		{
 			OnBump.Invoke();
 			return;

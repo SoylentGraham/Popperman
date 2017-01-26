@@ -186,19 +186,30 @@ public class Game : MonoBehaviour {
 
 	}
 
-	bool CanPlayerMoveTo(int2 xy)
+	bool CanPlayerMoveTo(int2 xy,bool Alive,Player self)
 	{
 		var map = GameObject.FindObjectOfType<Map>();
 
-		if ( GetBombAt(xy) != null )
-			return false;
-
-		if ( GetPlayerAt(xy) )
-			return false;
-
 		var MapTile = map[xy];
-		if ( MapTile != PopperMan.Tile.Floor )
-			return false;
+
+		//	let ghosts move over stuff!
+		if (Alive)
+		{
+			if (GetBombAt(xy) != null)
+				return false;
+
+			var PlayerHere = GetPlayerAt(xy);
+			if ( PlayerHere && PlayerHere!=self )
+				return false;
+
+			if (MapTile != PopperMan.Tile.Floor)
+				return false;
+		}
+		else
+		{
+			if (MapTile == PopperMan.Tile.OutOfBounds)
+				return false;
+		}
 
 		return true;
 	}
@@ -251,17 +262,23 @@ public class Game : MonoBehaviour {
 			{
 				if ( player.Input_JoinGame )
 				{
-					//	todo: be clever at placing them
-					player.Alive = true;
-					OnPlayerJoin.Invoke(player);
+					//	only join on free space
+					if ( CanPlayerMoveTo( player.xy, true, player ) )
+					{
+						//	todo: be clever at placing them
+						player.Alive = true;
+						OnPlayerJoin.Invoke(player);
+					}
 				}
 			}
 			else
 			{
 				player.PlaceBomb(map,this,CanPlaceBombAt,OnPlaceBomb);
-				player.Move( CanPlayerMoveTo );
 			}
 
+			//	let ghosts move!
+			player.Move( CanPlayerMoveTo );
+			
 			player.ClearInput ();
 		}
 

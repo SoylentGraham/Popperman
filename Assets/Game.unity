@@ -234,7 +234,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: W
+  Ident: '!'
   x: 12
   y: 5
   BombCount: 3
@@ -1204,7 +1204,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: O
+  Ident: L
   x: 18
   y: 1
   BombCount: 3
@@ -1300,7 +1300,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: P
+  Ident: H
   x: 7
   y: 5
   BombCount: 3
@@ -1769,7 +1769,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _Tick: 0
-  TicksPerSec: 3
+  TicksPerSec: 5
   _Players:
   - {fileID: 1021127078}
   - {fileID: 64925821}
@@ -1965,7 +1965,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: V
+  Ident: M
   x: 1
   y: 15
   BombCount: 3
@@ -2061,7 +2061,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: M
+  Ident: V
   x: 7
   y: 11
   BombCount: 3
@@ -2157,7 +2157,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: M
+  Ident: P
   x: 18
   y: 15
   BombCount: 3
@@ -2471,7 +2471,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: 3
+  Ident: Z
   x: 1
   y: 1
   BombCount: 3
@@ -2717,7 +2717,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: P
+  Ident: M
   x: 12
   y: 11
   BombCount: 3

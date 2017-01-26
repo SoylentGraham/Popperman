@@ -36,13 +36,13 @@ Material:
     m_Floats:
     - first:
         name: BombRadius
-      second: 0.69
+      second: 0.719
     - first:
         name: FlameRadius
       second: 1
     - first:
         name: FrameDelta
-      second: 0
+      second: 1
     - first:
         name: GlyphRadius
       second: 0.48
@@ -51,7 +51,7 @@ Material:
       second: 17
     - first:
         name: PlayerRadius
-      second: 0.886
+      second: 0.707
     - first:
         name: Width
       second: 20
