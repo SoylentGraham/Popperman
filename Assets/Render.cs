@@ -35,6 +35,9 @@ public class Render : MonoBehaviour {
 
 	void Update()
 	{
+		//MapShader.SetFloat("FrameDelta", game.FrameDelta );
+		MapShader.SetFloat("FrameDelta", 0 );
+
 		UpdateMapShader();
 	}
 
@@ -53,6 +56,15 @@ public class Render : MonoBehaviour {
 			MakeBombAnim ( FlamePos );
 		}
 
+	}
+
+	public void AddWallDestroyAnim(int2 xy)
+	{
+		var Anim = new TickAnimation ();
+		Anim.xy = xy;
+		Anim.Tile = PopperMan.Tile.WallCrumble;
+		Anim.Duration = 1;
+		Animations.Add( Anim );
 	}
 
 	public void UpdateAnimationTick()

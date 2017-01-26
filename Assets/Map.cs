@@ -65,7 +65,11 @@ public class Map : MonoBehaviour {
 		}
 		set
 		{
-			Tiles[GetMapIndex(x,y)] = value;
+			var Index = GetTilesAsNumbersIndex(x,y);
+
+			char[] TilesAsNumberChars = TilesAsNumbers.ToCharArray();
+			TilesAsNumberChars[Index] = GetChar( value );
+			TilesAsNumbers = new string(TilesAsNumberChars);
 		}
 	}
 
@@ -81,6 +85,31 @@ public class Map : MonoBehaviour {
 		}
 	}
 
+	int GetTilesAsNumbersIndex(int x,int y)
+	{
+		int MapIndex = GetMapIndex(x,y);
+		int TileIndex = 0;
+		for ( int i=0;	i<TilesAsNumbers.Length;	i++ )
+		{
+			var TileChar = TilesAsNumbers[i];
+			if ( TileChar < '0' || TileChar > '9' )
+				continue;
+
+			if ( MapIndex == TileIndex )
+				return i;
+
+			TileIndex++;
+		}
+		
+		return -1;
+	}
+
+	char GetChar(PopperMan.Tile Tile)
+	{
+		char Char = '0';
+		Char += (char)Tile;
+		return Char;
+	}
 
 	public void ResetMap()
 	{
@@ -93,9 +122,7 @@ public class Map : MonoBehaviour {
 		TilesAsNumbers = "";
 		for (int i = 0; i < Size; i++)
 		{
-			char Char = '0';
-			Char += (char)CurrentTiles[i];
-			TilesAsNumbers += Char;
+			TilesAsNumbers += GetChar(CurrentTiles[i]);
 			if ( (i % Width) == (Width-1) )
 				TilesAsNumbers += '\n';
 		}

@@ -69,7 +69,7 @@ public class Player : MonoBehaviour {
 
 	void SetDirectionIfKey(PopperMan.Direction Direction,PopperMan.NesPadJoystickButton Button)
 	{
-		SetDirectionIfKey (Direction, PopperMan.GetJoystickButtonName (JoystickIndex, this[Button] ));
+		SetDirectionIfKey (Direction, Pop.GetJoystickButtonName (JoystickIndex, this[Button] ));
 	}
 
 	void SetDirectionIfKey(PopperMan.Direction Direction,string KeyName)
@@ -107,9 +107,9 @@ public class Player : MonoBehaviour {
 		SetDirectionIfKey( PopperMan.Direction.Left, PopperMan.NesPadJoystickButton.Left );
 		SetDirectionIfKey( PopperMan.Direction.Right, PopperMan.NesPadJoystickButton.Right );
 
-		Input_Bomb |= Input.GetKeyDown (PopperMan.GetJoystickButtonName (JoystickIndex, this[PopperMan.NesPadJoystickButton.A] ));
-		Input_JoinGame |= Input.GetKeyDown (PopperMan.GetJoystickButtonName (JoystickIndex, this[PopperMan.NesPadJoystickButton.Start] ));
-		Input_ChangeIdent |= Input.GetKeyDown (PopperMan.GetJoystickButtonName (JoystickIndex, this[PopperMan.NesPadJoystickButton.Select] ));
+		Input_Bomb |= Input.GetKeyDown (Pop.GetJoystickButtonName (JoystickIndex, this[PopperMan.NesPadJoystickButton.A] ));
+		Input_JoinGame |= Input.GetKeyDown (Pop.GetJoystickButtonName (JoystickIndex, this[PopperMan.NesPadJoystickButton.Start] ));
+		Input_ChangeIdent |= Input.GetKeyDown (Pop.GetJoystickButtonName (JoystickIndex, this[PopperMan.NesPadJoystickButton.Select] ));
 		
 		if ( EnableKeyboardInput ) 
 		{

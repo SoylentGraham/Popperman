@@ -30,6 +30,7 @@ public class PopperMan
 	const int TILE_GHOST6	= 19;
 	const int TILE_GHOST7	= 20;
 	const int TILE_FLAME	= 21;
+	const int TILE_WALLCRUMBLE	= 22;
 
 
 	public enum Tile
@@ -38,6 +39,7 @@ public class PopperMan
 		Floor		= TILE_FLOOR,
 		Solid		= TILE_SOLID,
 		Wall		= TILE_WALL,
+		WallCrumble	= TILE_WALLCRUMBLE,
 
 		//	meta tiles
 		OutOfBounds	= TILE_INVALID,
@@ -63,6 +65,7 @@ public class PopperMan
 		Ghost6		= TILE_GHOST6,
 		Ghost7		= TILE_GHOST7,
 		Flame		= TILE_FLAME,
+		
 	}
 
 	public static Tile	GetPlayerTile(int Index) {	return (Tile)( (int)TILE_PLAYER0 + Index ); }
@@ -110,11 +113,24 @@ public class PopperMan
 		Right,
 	};
 
+
+}
+
+//	generic funcs!
+public class Pop
+{
 	static public string GetJoystickButtonName(int Joystick,int Button)
 	{
 		return "joystick " + (Joystick+1) + " button " + Button;
 	}
 
+	static public void AddUnique<T>(List<T> Array,T Value) where T : class
+	{
+		if ( Array.Exists( (v) => { return v==Value;	}	) )
+			return;
+
+		Array.Add( Value );
+	}
 
 }
 
@@ -146,6 +162,7 @@ public class int2
          return b.GetType() == GetType() && (this == (int2)b );
     }
 	
+
 }
 
 

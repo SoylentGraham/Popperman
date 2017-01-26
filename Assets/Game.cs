@@ -10,6 +10,9 @@ public class UnityEvent_Bomb : UnityEngine.Events.UnityEvent <Game.Bomb> {}
 public class UnityEvent_Player : UnityEngine.Events.UnityEvent <Player> {}
 
 
+[System.Serializable]
+public class UnityEvent_int2 : UnityEngine.Events.UnityEvent <int2> {}
+
 
 public class Game : MonoBehaviour {
 
@@ -60,6 +63,7 @@ public class Game : MonoBehaviour {
 	public UnityEngine.Events.UnityEvent	OnGameFinished;
 	public UnityEngine.Events.UnityEvent	OnGameStart;
 	public UnityEngine.Events.UnityEvent	OnTickEnd;
+	public UnityEvent_int2					OnWallDestroyed;
 	
 
 	
@@ -112,7 +116,7 @@ public class Game : MonoBehaviour {
 		return map [xy];
 	}
 
-	void PreExplodeBomb(Bomb bomb,System.Action<Player,Bomb> KillPlayer)
+	void PreExplodeBomb(Bomb bomb,System.Action<Player,Bomb> KillPlayer,System.Action<int2> DestroyTile)
 	{
 		bomb.Duration = 0;
 
@@ -125,7 +129,7 @@ public class Game : MonoBehaviour {
 				//	not already exploded (stop recursion)
 				if ( HitBomb.Duration != 0)
 				{
-					PreExplodeBomb (HitBomb, KillPlayer);
+					PreExplodeBomb (HitBomb, KillPlayer, DestroyTile);
 				}
 			}
 
@@ -139,10 +143,20 @@ public class Game : MonoBehaviour {
 			//	check if we're blocked by the map
 			var Tile = GetMapTileAt(xy);
 			if ( Tile == PopperMan.Tile.Solid )
+			{
 				return false;
+			}
+
+			//	break wall
+			if ( Tile == PopperMan.Tile.Wall )
+			{
+				bomb.Flames.Add(xy);
+				DestroyTile( xy );
+				//	stop here
+				return false;
+			}
 
 			bomb.Flames.Add(xy);
-
 			return true;
 		};
 
@@ -247,10 +261,16 @@ public class Game : MonoBehaviour {
 			player.ClearInput ();
 		}
 
+		var KilledPlayers = new List<Player>();
 		System.Action<Player, Bomb> KillPlayer = (p, b) =>
 		{
-			p.Alive = false;
-			OnPlayerDeathExplode.Invoke(p);
+			Pop.AddUnique( KilledPlayers, p );
+		};
+
+		var DestroyedTiles = new List<int2>();
+		System.Action<int2> DestroyTile = (xy) =>
+		{
+			Pop.AddUnique( DestroyedTiles, xy );
 		};
 
 		//	update bombs
@@ -261,10 +281,36 @@ public class Game : MonoBehaviour {
 			if ( bomb.Duration > 0 )
 				continue;
 
-			PreExplodeBomb( bomb, KillPlayer );
+			PreExplodeBomb( bomb, KillPlayer, DestroyTile );
 		}
 
-		var KilledPlayers = new List<Player>();
+
+		foreach ( var p in KilledPlayers )
+		{
+			p.Alive = false;
+			OnPlayerDeathExplode.Invoke(p);
+		}
+
+		//	check for end of game
+		if ( KilledPlayers.Count > 0 )
+		{
+		}		
+		
+		foreach ( var xy in DestroyedTiles )
+		{
+			var OldTile = map[xy];
+
+			var NewTile = PopperMan.Tile.Floor;
+
+			if ( OldTile == PopperMan.Tile.Wall )
+			{
+				//	randomly generate powerups
+				OnWallDestroyed.Invoke(xy);
+			}		
+
+			map[xy] = NewTile;
+		}		
+			
 
 		//	now actually "explode" all those that were triggered. 
 		//	restore to players bomb count
@@ -280,8 +326,6 @@ public class Game : MonoBehaviour {
 				OnBombExplode.Invoke(bomb);
 			Bombs.RemoveAt(i);
 		}
-
-		//	kill some players! end the game etc
 
 		OnTickEnd.Invoke ();
 	}
