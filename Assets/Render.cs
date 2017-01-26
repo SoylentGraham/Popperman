@@ -9,7 +9,10 @@ public class Render : MonoBehaviour {
 	[System.Serializable]
 	public class TickAnimation
 	{
+		public int				Time;		//	Time out of Duration in ticks
 		public int				Duration;	//	life in ticks
+		public float			TimeDelta {	get {return Time / (float)Duration; } }
+		public float			TimeStep {	get {return 1 / (float)Duration; } }
 		public PopperMan.Tile	Tile;
 		public int2				xy;
 	}
@@ -48,6 +51,7 @@ public class Render : MonoBehaviour {
 			Anim.xy = xy;
 			Anim.Tile = PopperMan.Tile.Flame;
 			Anim.Duration = 2;
+			Anim.Time = Anim.Duration;
 			Animations.Add( Anim );
 		};
 
@@ -63,7 +67,8 @@ public class Render : MonoBehaviour {
 		var Anim = new TickAnimation ();
 		Anim.xy = xy;
 		Anim.Tile = PopperMan.Tile.WallCrumble;
-		Anim.Duration = 1;
+		Anim.Duration = 2;
+		Anim.Time = Anim.Duration;
 		Animations.Add( Anim );
 	}
 
@@ -72,10 +77,10 @@ public class Render : MonoBehaviour {
 		for ( int a=Animations.Count-1;	a>=0;	a-- )
 		{
 			var Anim = Animations [a];
-			Anim.Duration--;
+			Anim.Time--;
 
 			//	gr: this may have started on this frame, and this end of tick is triggered at start, so let it go to 0
-			if (Anim.Duration >= 0)
+			if (Anim.Time >= 0)
 				continue;
 
 			Animations.RemoveAt(a);
@@ -93,7 +98,7 @@ public class Render : MonoBehaviour {
 		
 		var MapTiles = new List<float>();
 		var GameTiles = new List<float>();
-		var AnimTiles = new List<float>();
+		var AnimTiles = new List<Vector4>();
 
 		for ( int i=0;	i<map.Width*map.Height;	i++ )
 		{
@@ -101,12 +106,16 @@ public class Render : MonoBehaviour {
 			var MapTile = map[xy];
 			var GameTile = PopperMan.Tile.None;
 			var AnimTile = PopperMan.Tile.None;
+			float AnimTime = 0;
+			float AnimTimeStep = 0;
 
 			//	check for anims
 			foreach (var Anim in Animations) {
 				if (Anim.xy != xy)
 					continue;
 				AnimTile = Anim.Tile;
+				AnimTime = Anim.TimeDelta;
+				AnimTimeStep = Anim.TimeStep;
 			}
 
 			if ( game.GetBombAt(xy) != null )
@@ -123,12 +132,12 @@ public class Render : MonoBehaviour {
 
 			MapTiles.Add( (float)MapTile );
 			GameTiles.Add( (float)GameTile );
-			AnimTiles.Add( (float)AnimTile );
+			AnimTiles.Add( new Vector4( (float)AnimTile, AnimTime, AnimTimeStep, 0) );
 		}
 
 		MapShader.SetFloatArray("MapTiles", MapTiles );
 		MapShader.SetFloatArray("GameTiles", GameTiles );
-		MapShader.SetFloatArray("AnimTiles", AnimTiles );
+		MapShader.SetVectorArray("AnimTiles", AnimTiles );
 
 		MapShader.SetTexture("IdentTexture", IdentFontTexture );
 		var PlayerGlyphs = new List<Vector4>();

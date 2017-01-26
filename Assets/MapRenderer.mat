@@ -35,6 +35,9 @@ Material:
         name: FlameRadius
       second: 1
     - first:
+        name: FrameDelta
+      second: 0
+    - first:
         name: GlyphRadius
       second: 0.48
     - first:

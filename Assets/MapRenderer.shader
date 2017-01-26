@@ -96,7 +96,7 @@
 			//	gr: on OSX int Tiles[] renders everything as 0 or <invalid>
 			float MapTiles[MAX_WIDTH*MAX_HEIGHT];
 			float GameTiles[MAX_WIDTH*MAX_HEIGHT];
-			float AnimTiles[MAX_WIDTH*MAX_HEIGHT];
+			float4 AnimTiles[MAX_WIDTH*MAX_HEIGHT];
 
 		#define MAX_PLAYERS	8
 			float4 IdentUvs[MAX_PLAYERS];
@@ -158,7 +158,7 @@
 			}
 
 
-			float4 GetTileColour(int Tile,float2 uv)
+			float4 GetTileColour(int Tile,float2 uv,float AnimTime)
 			{
 				switch( Tile )
 				{
@@ -169,7 +169,7 @@
 					case TILE_FLOOR:		return TileColour_Floor;
 					case TILE_SOLID:		return TileColour_Solid;
 					case TILE_WALL:			return TileColour_Wall;
-					case TILE_WALLCRUMBLE:	return GetCircle( uv, lerp( 1,0,FrameDelta), TileColour_Wall );
+					case TILE_WALLCRUMBLE:	return GetCircle( uv, lerp( 1,0,1-AnimTime), TileColour_Wall );
 					case TILE_BOMB:			return GetCircle( uv, BombRadius, TileColour_Bomb );
 					case TILE_PLAYER0:
 					case TILE_PLAYER1:
@@ -191,7 +191,7 @@
 					case TILE_GHOST7:
 						return GetPlayerGlyph( Tile-TILE_GHOST0, uv, PlayerRadius, TileColour_Ghost);
 
-					case TILE_FLAME:	return GetCircle( uv, lerp(FlameRadius,0,FrameDelta), TileColour_Flame);
+					case TILE_FLAME:	return GetCircle( uv, lerp(FlameRadius,0,1-AnimTime), TileColour_Flame);
 				}
 			}
 		
@@ -201,11 +201,11 @@
 				return Rgb;
 			}
 
-			float3 GetTileColour(float2 Tileuv,int MapTile,int GameTile,int AnimTile)
+			float3 GetTileColour(float2 Tileuv,int MapTile,int GameTile,int AnimTile,float AnimTime)
 			{
-				float4 Colour = GetTileColour( MapTile, Tileuv );
-				Colour.xyz = BlendColour( Colour, GetTileColour(GameTile,Tileuv) );
-				Colour.xyz = BlendColour( Colour, GetTileColour(AnimTile,Tileuv) );
+				float4 Colour = GetTileColour( MapTile, Tileuv, AnimTime );
+				Colour.xyz = BlendColour( Colour, GetTileColour(GameTile,Tileuv,AnimTime) );
+				Colour.xyz = BlendColour( Colour, GetTileColour(AnimTile,Tileuv,AnimTime) );
 				return Colour;
 			}
 			
@@ -217,7 +217,10 @@
 				uv = frac(uv);
 				int i = x + (y*Width);
 				
-				float3 Colour = GetTileColour( uv, MapTiles[i], GameTiles[i], AnimTiles[i] );
+				float AnimTile = AnimTiles[i].x;
+				float AnimTime = AnimTiles[i].y + ( FrameDelta * AnimTiles[i].z );
+
+				float3 Colour = GetTileColour( uv, MapTiles[i], GameTiles[i], AnimTile, AnimTime );
 
 				//	debug framedelta
 				//Colour = lerp( Colour, float3(uv,0), FrameDelta );
