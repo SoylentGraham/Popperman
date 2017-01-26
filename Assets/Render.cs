@@ -35,9 +35,9 @@ public class Render : MonoBehaviour {
 
 	void Update()
 	{
-		//MapShader.SetFloat("FrameDelta", game.FrameDelta );
-		MapShader.SetFloat("FrameDelta", 0 );
-
+		var game = GameObject.FindObjectOfType<Game>();
+		MapShader.SetFloat("FrameDelta", game.FrameDelta );
+		
 		UpdateMapShader();
 	}
 

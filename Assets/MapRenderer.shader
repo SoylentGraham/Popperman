@@ -2,6 +2,7 @@
 {
 	Properties
 	{
+		FrameDelta("FrameDelta", Range(0,1) ) = 0
 		Width("Width",Range(1,100) ) = 20
 		Height("Height",Range(1,100) ) = 20
 		
@@ -168,7 +169,7 @@
 					case TILE_FLOOR:		return TileColour_Floor;
 					case TILE_SOLID:		return TileColour_Solid;
 					case TILE_WALL:			return TileColour_Wall;
-					case TILE_WALLCRUMBLE:	return GetCircle( uv, 1-FrameDelta, TileColour_Wall );
+					case TILE_WALLCRUMBLE:	return GetCircle( uv, lerp( 1,0,FrameDelta), TileColour_Wall );
 					case TILE_BOMB:			return GetCircle( uv, BombRadius, TileColour_Bomb );
 					case TILE_PLAYER0:
 					case TILE_PLAYER1:
@@ -178,7 +179,7 @@
 					case TILE_PLAYER5:
 					case TILE_PLAYER6:
 					case TILE_PLAYER7:
-						return GetPlayerGlyph( Tile-TILE_PLAYER0, uv, PlayerRadius, TileColour_Player);
+						return GetPlayerGlyph( Tile-TILE_PLAYER0, uv, lerp( PlayerRadius*0.9f, PlayerRadius, FrameDelta), TileColour_Player);
 
 					case TILE_GHOST0:
 					case TILE_GHOST1:
@@ -190,7 +191,7 @@
 					case TILE_GHOST7:
 						return GetPlayerGlyph( Tile-TILE_GHOST0, uv, PlayerRadius, TileColour_Ghost);
 
-					case TILE_FLAME:	return GetCircle( uv, (1-FrameDelta)*FlameRadius, TileColour_Flame);
+					case TILE_FLAME:	return GetCircle( uv, lerp(FlameRadius,0,FrameDelta), TileColour_Flame);
 				}
 			}
 		
@@ -217,6 +218,10 @@
 				int i = x + (y*Width);
 				
 				float3 Colour = GetTileColour( uv, MapTiles[i], GameTiles[i], AnimTiles[i] );
+
+				//	debug framedelta
+				//Colour = lerp( Colour, float3(uv,0), FrameDelta );
+
 				return float4( Colour, 1 );
 			}
 			ENDCG

@@ -39,8 +39,9 @@ public class Game : MonoBehaviour {
 	public int		TicksPerSec = 5;
 	float			TickCountdown = 0;
 	float			TickMs {	get {	return 1000 / (float)TicksPerSec; } }
-	//	the time (0...1) remaining before the next tick
-	public float	FrameDelta { get	{	return TickCountdown / TickMs;	}	}
+	float			TickSecs {	get {	return TickMs / 1000.0f; } }
+//	the time (0...1) remaining before the next tick
+	public float	FrameDelta { get	{	return TickCountdown / TickSecs;	}	}
 
 
 	public List<Player>	_Players;
@@ -73,7 +74,7 @@ public class Game : MonoBehaviour {
 		if ( TickCountdown < 0 )
 		{
 			Tick();
-			TickCountdown = TickMs / 1000.0f;
+			TickCountdown = TickSecs;
 		}
 	}
 
@@ -150,7 +151,8 @@ public class Game : MonoBehaviour {
 			//	break wall
 			if ( Tile == PopperMan.Tile.Wall )
 			{
-				bomb.Flames.Add(xy);
+				//	gr: crrently flame overrides wall break anim, sort this
+				//bomb.Flames.Add(xy);
 				DestroyTile( xy );
 				//	stop here
 				return false;
