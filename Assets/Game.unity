@@ -234,7 +234,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: 4
+  Ident: W
   x: 12
   y: 5
   BombCount: 3
@@ -1204,7 +1204,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: K
+  Ident: O
   x: 18
   y: 1
   BombCount: 3
@@ -1300,7 +1300,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: A
+  Ident: P
   x: 7
   y: 5
   BombCount: 3
@@ -1769,7 +1769,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _Tick: 0
-  TicksPerSec: 6
+  TicksPerSec: 3
   _Players:
   - {fileID: 1021127078}
   - {fileID: 64925821}
@@ -1965,7 +1965,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: H
+  Ident: V
   x: 1
   y: 15
   BombCount: 3
@@ -2061,7 +2061,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: '!'
+  Ident: M
   x: 7
   y: 11
   BombCount: 3
@@ -2157,7 +2157,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: E
+  Ident: M
   x: 18
   y: 15
   BombCount: 3
@@ -2471,7 +2471,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: '!'
+  Ident: 3
   x: 1
   y: 1
   BombCount: 3
@@ -2532,6 +2532,47 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1881933280
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1881933282}
+  - component: {fileID: 1881933281}
+  m_Layer: 0
+  m_Name: Noise Texture
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1881933281
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1881933280}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a04d004f244dd424cb3b8819148f329e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NoiseTexture: {fileID: 8400000, guid: 012c4732078d28d449f0805d58c9a9f6, type: 2}
+--- !u!4 &1881933282
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1881933280}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 354.8125, y: 287.375, z: -101.3125}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1882385192
 GameObject:
@@ -2676,7 +2717,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: H
+  Ident: P
   x: 12
   y: 11
   BombCount: 3

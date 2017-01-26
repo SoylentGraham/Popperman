@@ -11,8 +11,6 @@ public class Render : MonoBehaviour {
 	{
 		public int				Time;		//	Time out of Duration in ticks
 		public int				Duration;	//	life in ticks
-		public float			TimeDelta {	get {return Time / (float)Duration; } }
-		public float			TimeStep {	get {return 1 / (float)Duration; } }
 		public PopperMan.Tile	Tile;
 		public int2				xy;
 	}
@@ -40,6 +38,7 @@ public class Render : MonoBehaviour {
 	{
 		var game = GameObject.FindObjectOfType<Game>();
 		MapShader.SetFloat("FrameDelta", game.FrameDelta );
+		MapShader.SetFloat("Frame", game.Frame );
 		
 		UpdateMapShader();
 	}
@@ -51,7 +50,7 @@ public class Render : MonoBehaviour {
 			Anim.xy = xy;
 			Anim.Tile = PopperMan.Tile.Flame;
 			Anim.Duration = 2;
-			Anim.Time = Anim.Duration;
+			Anim.Time = 0;
 			Animations.Add( Anim );
 		};
 
@@ -68,7 +67,7 @@ public class Render : MonoBehaviour {
 		Anim.xy = xy;
 		Anim.Tile = PopperMan.Tile.WallCrumble;
 		Anim.Duration = 2;
-		Anim.Time = Anim.Duration;
+		Anim.Time = 0;
 		Animations.Add( Anim );
 	}
 
@@ -77,10 +76,10 @@ public class Render : MonoBehaviour {
 		for ( int a=Animations.Count-1;	a>=0;	a-- )
 		{
 			var Anim = Animations [a];
-			Anim.Time--;
+			Anim.Time++;
 
 			//	gr: this may have started on this frame, and this end of tick is triggered at start, so let it go to 0
-			if (Anim.Time >= 0)
+			if (Anim.Time <= Anim.Duration)
 				continue;
 
 			Animations.RemoveAt(a);
@@ -107,15 +106,15 @@ public class Render : MonoBehaviour {
 			var GameTile = PopperMan.Tile.None;
 			var AnimTile = PopperMan.Tile.None;
 			float AnimTime = 0;
-			float AnimTimeStep = 0;
+			float AnimDuration = 0;
 
 			//	check for anims
 			foreach (var Anim in Animations) {
 				if (Anim.xy != xy)
 					continue;
 				AnimTile = Anim.Tile;
-				AnimTime = Anim.TimeDelta;
-				AnimTimeStep = Anim.TimeStep;
+				AnimTime = Anim.Time-1;
+				AnimDuration = Anim.Duration;
 			}
 
 			if ( game.GetBombAt(xy) != null )
@@ -132,7 +131,7 @@ public class Render : MonoBehaviour {
 
 			MapTiles.Add( (float)MapTile );
 			GameTiles.Add( (float)GameTile );
-			AnimTiles.Add( new Vector4( (float)AnimTile, AnimTime, AnimTimeStep, 0) );
+			AnimTiles.Add( new Vector4( (float)AnimTile, AnimTime, AnimDuration, 0) );
 		}
 
 		MapShader.SetFloatArray("MapTiles", MapTiles );

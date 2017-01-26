@@ -22,6 +22,12 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - first:
+        name: NoiseTexture
+      second:
+        m_Texture: {fileID: 8400000, guid: 012c4732078d28d449f0805d58c9a9f6, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - first:
         name: _MainTex
       second:
         m_Texture: {fileID: 0}

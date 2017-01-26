@@ -20,6 +20,7 @@
 		GlyphRadius("GlyphRadius", Range(0,1) ) = 0.6
 		
 		IdentTexture("IdentTexture", 2D ) = "white" {}
+		NoiseTexture("NoiseTexture", 2D ) = "white" {}
 	}
 	SubShader
 	{
@@ -92,6 +93,7 @@
 			int Width;
 			int Height;
 			float FrameDelta;
+			float Frame;
 
 			//	gr: on OSX int Tiles[] renders everything as 0 or <invalid>
 			float MapTiles[MAX_WIDTH*MAX_HEIGHT];
@@ -101,6 +103,7 @@
 		#define MAX_PLAYERS	8
 			float4 IdentUvs[MAX_PLAYERS];
 			sampler2D IdentTexture;
+			sampler2D NoiseTexture;
 			
 			v2f vert (appdata v)
 			{
@@ -157,6 +160,42 @@
 				return Colour;
 			}
 
+			float4 GetNoise(float2 uv,float Time,float4 Colour)
+			{
+				float Noise = tex2D( NoiseTexture, uv ).y;
+				if ( Noise >= Time )
+					return Colour;
+				return float4( Colour.xyz, 0 );
+			}
+
+			float GetPulse()
+			{
+				float Step = 3.0f;
+				float Time = frac( Frame / Step ) + ( FrameDelta/Step);
+				return Time;
+			}
+
+			float BombAnimRadius()
+			{
+				float Pulse = GetPulse();
+
+				float Min = 0.7f;
+				float Max = 1.0f;
+				float Range = Max - Min;
+
+				float Time = abs(lerp( -1, 1, Pulse ));
+				float Scale = Max + ( Range  * Time );
+
+				return Scale * BombRadius;
+				/*
+				return FrameDelta;
+				
+				float Loops = 5;
+				float Time = frac(FrameDelta);
+				float TimeRad = lerp( -2*UNITY_PI, 2*UNITY_PI, Time );
+				return lerp( Min, Max, abs( cos( TimeRad ) ) );
+				*/
+			}
 
 			float4 GetTileColour(int Tile,float2 uv,float AnimTime)
 			{
@@ -169,8 +208,8 @@
 					case TILE_FLOOR:		return TileColour_Floor;
 					case TILE_SOLID:		return TileColour_Solid;
 					case TILE_WALL:			return TileColour_Wall;
-					case TILE_WALLCRUMBLE:	return GetCircle( uv, lerp( 1,0,1-AnimTime), TileColour_Wall );
-					case TILE_BOMB:			return GetCircle( uv, BombRadius, TileColour_Bomb );
+					case TILE_WALLCRUMBLE:	return GetNoise( uv, AnimTime, TileColour_Wall );
+					case TILE_BOMB:			return GetCircle( uv, BombAnimRadius(), TileColour_Bomb );
 					case TILE_PLAYER0:
 					case TILE_PLAYER1:
 					case TILE_PLAYER2:
@@ -191,7 +230,7 @@
 					case TILE_GHOST7:
 						return GetPlayerGlyph( Tile-TILE_GHOST0, uv, PlayerRadius, TileColour_Ghost);
 
-					case TILE_FLAME:	return GetCircle( uv, lerp(FlameRadius,0,1-AnimTime), TileColour_Flame);
+					case TILE_FLAME:	return GetCircle( uv, lerp(FlameRadius,0,AnimTime), TileColour_Flame);
 				}
 			}
 		
@@ -218,8 +257,11 @@
 				int i = x + (y*Width);
 				
 				float AnimTile = AnimTiles[i].x;
-				float AnimTime = AnimTiles[i].y + ( FrameDelta * AnimTiles[i].z );
 
+				float Frame = AnimTiles[i].y;
+				float FrameCount = AnimTiles[i].z;
+				float AnimTime = (Frame / FrameCount) + ( FrameDelta * (1/FrameCount) );
+				
 				float3 Colour = GetTileColour( uv, MapTiles[i], GameTiles[i], AnimTile, AnimTime );
 
 				//	debug framedelta

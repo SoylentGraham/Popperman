@@ -32,7 +32,9 @@ public class Game : MonoBehaviour {
 
 	[InspectorButton("Tick")]
 	public bool	_Tick;
-	int Frame = 0;
+
+	[System.NonSerialized]
+	public int Frame = 0;
 
 
 	[Range(1,60)]
@@ -41,7 +43,7 @@ public class Game : MonoBehaviour {
 	float			TickMs {	get {	return 1000 / (float)TicksPerSec; } }
 	float			TickSecs {	get {	return TickMs / 1000.0f; } }
 //	the time (0...1) remaining before the next tick
-	public float	FrameDelta { get	{	return TickCountdown / TickSecs;	}	}
+	public float	FrameDelta { get	{	return (TickSecs-TickCountdown) / TickSecs;	}	}
 
 
 	public List<Player>	_Players;
