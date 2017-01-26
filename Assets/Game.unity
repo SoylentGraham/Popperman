@@ -234,7 +234,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: '!'
+  Ident: 6
   x: 12
   y: 5
   BombCount: 3
@@ -1300,7 +1300,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: H
+  Ident: C
   x: 7
   y: 5
   BombCount: 3
@@ -1965,7 +1965,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: M
+  Ident: E
   x: 1
   y: 15
   BombCount: 3
@@ -2061,7 +2061,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: V
+  Ident: F
   x: 7
   y: 11
   BombCount: 3
@@ -2157,7 +2157,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: P
+  Ident: 8
   x: 18
   y: 15
   BombCount: 3
@@ -2471,7 +2471,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: Z
+  Ident: H
   x: 1
   y: 1
   BombCount: 3
@@ -2555,11 +2555,12 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1881933280}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a04d004f244dd424cb3b8819148f329e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  NoiseShader: {fileID: 2100000, guid: 92fe48cd0dc89a7498511eefb350925f, type: 2}
   NoiseTexture: {fileID: 8400000, guid: 012c4732078d28d449f0805d58c9a9f6, type: 2}
 --- !u!4 &1881933282
 Transform:
@@ -2717,7 +2718,7 @@ MonoBehaviour:
   Input_Bomb: 0
   Input_JoinGame: 0
   Input_ChangeIdent: 0
-  Ident: M
+  Ident: E
   x: 12
   y: 11
   BombCount: 3

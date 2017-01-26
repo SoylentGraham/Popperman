@@ -14,6 +14,9 @@
 		TileColour_Ghost("TileColour_Ghost",COLOR) = (0,0,1,0.4)
 		TileColour_Flame("TileColour_Flame",COLOR) = (1,0.3,0,1)
 
+		FloorColourMult("FloorColourMult", COLOR ) = (0.1,1,1,1)
+		ForcedAlpha("ForcedAlpha", Range(0.5,1) ) = 1
+
 		BombRadius("BombRadius", Range(0,1) ) = 0.6
 		PlayerRadius("PlayerRadius", Range(0,1) ) = 0.8
 		FlameRadius("FlameRadius", Range(0,1) ) = 1.0
@@ -82,6 +85,8 @@
 			float4 TileColour_Player;
 			float4 TileColour_Ghost;
 			float4 TileColour_Flame;
+			float ForcedAlpha;
+			float3 FloorColourMult;
 
 			float BombRadius;
 			float PlayerRadius;
@@ -197,7 +202,20 @@
 				*/
 			}
 
-			float4 GetTileColour(int Tile,float2 uv,float AnimTime)
+			float4 GetFloorColour(int2 Tilexy,float2 uv)
+			{
+				float u = Tilexy.x / (float)Width;
+				float v = Tilexy.y / (float)Height;
+				u += uv.x * ( 1/(float)Width );
+				v += uv.y * ( 1/(float)Height );
+
+				float3 Perlin = tex2D( NoiseTexture, float2(u,v) ).xyz;
+				//Perlin = lerp( float3(1,0,0), float3(0,1,0), Perlin.x );
+				Perlin *= FloorColourMult;
+				return float4( Perlin, 1 );
+			}
+
+			float4 GetTileColour(int2 Tilexy,int Tile,float2 uv,float AnimTime)
 			{
 				switch( Tile )
 				{
@@ -205,7 +223,7 @@
 					case TILE_INVALID:	return TileColour_Invalid;
 
 					case TILE_NONE:			return TileColour_None;
-					case TILE_FLOOR:		return TileColour_Floor;
+					case TILE_FLOOR:		return GetFloorColour( Tilexy, uv );
 					case TILE_SOLID:		return TileColour_Solid;
 					case TILE_WALL:			return TileColour_Wall;
 					case TILE_WALLCRUMBLE:	return GetNoise( uv, AnimTime, TileColour_Wall );
@@ -234,17 +252,18 @@
 				}
 			}
 		
-			float3 BlendColour(float3 Bottom,float4 Top)
+			float3 BlendColour(float3 Bottom,float4 Top,float AlphaMult)
 			{
-				float3 Rgb = lerp( Bottom.xyz, Top.xyz, Top.w );
+				float3 Rgb = lerp( Bottom.xyz, Top.xyz, Top.w * AlphaMult );
 				return Rgb;
 			}
 
-			float3 GetTileColour(float2 Tileuv,int MapTile,int GameTile,int AnimTile,float AnimTime)
+			float3 GetTileColour(int2 Tilexy,float2 Tileuv,int MapTile,int GameTile,int AnimTile,float AnimTime)
 			{
-				float4 Colour = GetTileColour( MapTile, Tileuv, AnimTime );
-				Colour.xyz = BlendColour( Colour, GetTileColour(GameTile,Tileuv,AnimTime) );
-				Colour.xyz = BlendColour( Colour, GetTileColour(AnimTile,Tileuv,AnimTime) );
+				float4 Colour = GetFloorColour( Tilexy, Tileuv );
+				Colour.xyz = BlendColour( Colour, GetTileColour(Tilexy, MapTile,Tileuv,AnimTime), ForcedAlpha );
+				Colour.xyz = BlendColour( Colour, GetTileColour(Tilexy, GameTile,Tileuv,AnimTime), 1 );
+				Colour.xyz = BlendColour( Colour, GetTileColour(Tilexy, AnimTile,Tileuv,AnimTime), 1 );
 				return Colour;
 			}
 			
@@ -262,7 +281,7 @@
 				float FrameCount = AnimTiles[i].z;
 				float AnimTime = (Frame / FrameCount) + ( FrameDelta * (1/FrameCount) );
 				
-				float3 Colour = GetTileColour( uv, MapTiles[i], GameTiles[i], AnimTile, AnimTime );
+				float3 Colour = GetTileColour( int2(x,y), uv, MapTiles[i], GameTiles[i], AnimTile, AnimTime );
 
 				//	debug framedelta
 				//Colour = lerp( Colour, float3(uv,0), FrameDelta );

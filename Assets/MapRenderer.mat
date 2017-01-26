@@ -41,6 +41,9 @@ Material:
         name: FlameRadius
       second: 1
     - first:
+        name: ForcedAlpha
+      second: 0.776
+    - first:
         name: FrameDelta
       second: 1
     - first:
@@ -56,6 +59,9 @@ Material:
         name: Width
       second: 20
     m_Colors:
+    - first:
+        name: FloorColourMult
+      second: {r: 0.466, g: 1, b: 1, a: 1}
     - first:
         name: TileBomb
       second: {r: 0, g: 0, b: 0, a: 1}
