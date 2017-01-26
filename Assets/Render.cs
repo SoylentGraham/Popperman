@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 [ExecuteInEditMode]
 public class Render : MonoBehaviour {
@@ -15,11 +16,22 @@ public class Render : MonoBehaviour {
 
 
 	public Material	MapShader;
+	public Font		IdentFont;
+	public Texture	IdentFontTexture;
 
 	[InspectorButton("UpdateMapShader")]
 	public bool		_UpdateMapShader;
 
 	public List<TickAnimation>	Animations = new List<TickAnimation>();
+
+	public Vector2 GetCanvasTileUv(int2 xy)
+	{
+		var map = GameObject.FindObjectOfType<Map>();
+		var uv = new Vector2();
+		uv.x = xy.x / (float)map.Width;
+		uv.y = xy.y / (float)map.Height;
+		return uv;
+	}
 
 	void Update()
 	{
@@ -91,7 +103,10 @@ public class Render : MonoBehaviour {
 			{
 				var Player = game.GetPlayerAt(xy);
 				if ( Player )
-					GameTile = Player.Alive ? PopperMan.Tile.Player : PopperMan.Tile.Ghost;
+				{
+					var PlayerIndex = game.Players.IndexOf(Player);
+					GameTile = Player.Alive ? PopperMan.GetPlayerTile(PlayerIndex) : PopperMan.GetGhostTile(PlayerIndex);
+				}
 			}
 
 			MapTiles.Add( (float)MapTile );
@@ -102,6 +117,25 @@ public class Render : MonoBehaviour {
 		MapShader.SetFloatArray("MapTiles", MapTiles );
 		MapShader.SetFloatArray("GameTiles", GameTiles );
 		MapShader.SetFloatArray("AnimTiles", AnimTiles );
+
+		MapShader.SetTexture("IdentTexture", IdentFontTexture );
+		var PlayerGlyphs = new List<Vector4>();
+		for ( int p=0;	p<game.Players.Count;	p++ )
+		{
+			var player = game.Players[p];
+			var Glyphuv = new Vector4();
+			var CharInfo = new CharacterInfo();
+			if ( IdentFont.GetCharacterInfo( player.Ident[0], out CharInfo ) )
+			{
+				Glyphuv.x = CharInfo.uvTopLeft.x;
+				Glyphuv.y = CharInfo.uvTopLeft.y;
+				Glyphuv.z = CharInfo.uvBottomRight.x;
+				Glyphuv.w = CharInfo.uvBottomRight.y;
+			}
+			PlayerGlyphs.Add(Glyphuv);
+		}
+		MapShader.SetVectorArray("IdentUvs", PlayerGlyphs );
+		
 
 		UnityEditor.SceneView.RepaintAll();
 	}

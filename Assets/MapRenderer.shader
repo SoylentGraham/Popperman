@@ -16,6 +16,9 @@
 		BombRadius("BombRadius", Range(0,1) ) = 0.6
 		PlayerRadius("PlayerRadius", Range(0,1) ) = 0.8
 		FlameRadius("FlameRadius", Range(0,1) ) = 1.0
+		GlyphRadius("GlyphRadius", Range(0,1) ) = 0.6
+		
+		IdentTexture("IdentTexture", 2D ) = "white" {}
 	}
 	SubShader
 	{
@@ -42,15 +45,30 @@
 				float4 vertex : SV_POSITION;
 			};
 
-		#define TILE_INVALID	-1
-		#define TILE_NONE	0
-		#define TILE_FLOOR	1
-		#define TILE_SOLID	2
-		#define TILE_WALL	3
-		#define TILE_BOMB	4
-		#define TILE_PLAYER	5
-		#define TILE_GHOST	6
-		#define TILE_FLAME	7
+		
+			#define TILE_INVALID -1
+		#define TILE_NONE		0
+		#define TILE_FLOOR		1
+		#define TILE_SOLID			2
+		#define TILE_WALL		3
+		#define TILE_BOMB		4
+		#define TILE_PLAYER0	 5
+		#define TILE_PLAYER1	6
+		#define TILE_PLAYER2	7
+		#define TILE_PLAYER3	8
+		#define TILE_PLAYER4	 9
+		#define TILE_PLAYER5		10
+		#define TILE_PLAYER6	11
+		#define TILE_PLAYER7	12
+		#define TILE_GHOST0		13
+		#define TILE_GHOST1		14
+		#define TILE_GHOST2		15
+		#define TILE_GHOST3		16
+		#define TILE_GHOST4		17
+		#define TILE_GHOST5		 18
+		#define TILE_GHOST6		 19
+		#define TILE_GHOST7		20
+		#define TILE_FLAME		21
 
 		#define TileColour_Invalid float4(1,0,1,1)
 		#define TileColour_None float4(0,0,0,0)
@@ -65,7 +83,7 @@
 			float BombRadius;
 			float PlayerRadius;
 			float FlameRadius;
-
+			float GlyphRadius;
 
 		#define MAX_WIDTH	20
 		#define MAX_HEIGHT	20
@@ -77,6 +95,9 @@
 			float GameTiles[MAX_WIDTH*MAX_HEIGHT];
 			float AnimTiles[MAX_WIDTH*MAX_HEIGHT];
 
+		#define MAX_PLAYERS	8
+			float4 IdentUvs[MAX_PLAYERS];
+			sampler2D IdentTexture;
 			
 			v2f vert (appdata v)
 			{
@@ -99,6 +120,40 @@
 					return float4( Colour.xyz, 0 );
 			}
 
+			float4 GetPlayerGlyph(int Player,float2 uv,float Radius,float4 Colour)
+			{
+				Colour = GetCircle( uv, Radius, Colour );
+
+				//	add the font too
+				uv.x = 1-uv.x;
+
+				float GlyphScale = 1 / GlyphRadius;
+				float Step = (1/Radius) * GlyphScale;
+
+				float2 Glyphuv = uv;
+				Glyphuv -= 0.5f;
+				Glyphuv *= Step;
+				Glyphuv += 0.5f;
+				Glyphuv = min( 1, max(0,Glyphuv));
+				
+				float u = lerp( IdentUvs[Player].x, IdentUvs[Player].z, 1-Glyphuv.x );
+				float v = lerp( IdentUvs[Player].y, IdentUvs[Player].w, Glyphuv.y );
+				float4 Glyph = tex2D( IdentTexture, float2(u,v) );
+
+				//Colour.xyz = lerp( Colour, float3(1,1,1), Glyph.a );
+				//Colour.a = max( Colour.x, Glyph.a );
+				Colour.a *= 1 - Glyph.a;
+				//Colour += Glyph;
+				//if ( Glyph.a > 0.5f )
+				{
+					//Colour *= Glyph;
+					//Colour.xy = float2(u,v);
+					//Colour.xy = uv;
+				}
+
+				return Colour;
+			}
+
 
 			float4 GetTileColour(int Tile,float2 uv)
 			{
@@ -112,8 +167,26 @@
 					case TILE_SOLID:	return TileColour_Solid;
 					case TILE_WALL:		return TileColour_Wall;
 					case TILE_BOMB:		return GetCircle( uv, BombRadius, TileColour_Bomb );
-					case TILE_PLAYER:	return GetCircle( uv, PlayerRadius, TileColour_Player);
-					case TILE_GHOST:	return GetCircle( uv, PlayerRadius, TileColour_Ghost);
+					case TILE_PLAYER0:
+					case TILE_PLAYER1:
+					case TILE_PLAYER2:
+					case TILE_PLAYER3:
+					case TILE_PLAYER4:
+					case TILE_PLAYER5:
+					case TILE_PLAYER6:
+					case TILE_PLAYER7:
+						return GetPlayerGlyph( Tile-TILE_PLAYER0, uv, PlayerRadius, TileColour_Player);
+
+					case TILE_GHOST0:
+					case TILE_GHOST1:
+					case TILE_GHOST2:
+					case TILE_GHOST3:
+					case TILE_GHOST4:
+					case TILE_GHOST5:
+					case TILE_GHOST6:
+					case TILE_GHOST7:
+						return GetPlayerGlyph( Tile-TILE_GHOST0, uv, PlayerRadius, TileColour_Ghost);
+
 					case TILE_FLAME:	return GetCircle( uv, FlameRadius, TileColour_Flame);
 				}
 			}

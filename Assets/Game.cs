@@ -34,8 +34,11 @@ public class Game : MonoBehaviour {
 
 	[Range(1,60)]
 	public int		TicksPerSec = 5;
-	float	TickCountdown = 0;
-	float	TickMs {	get {	return 1000 / (float)TicksPerSec; } }
+	float			TickCountdown = 0;
+	float			TickMs {	get {	return 1000 / (float)TicksPerSec; } }
+	//	the time (0...1) remaining before the next tick
+	public float	FrameDelta { get	{	return TickCountdown / TickMs;	}	}
+
 
 	public List<Player>	_Players;
 	public List<Bomb>	Bombs = new List<Bomb>();
@@ -50,10 +53,12 @@ public class Game : MonoBehaviour {
 	}
 
 	[Header("Game events - eg sound")]
+	public UnityEvent_Bomb					OnBombPlaced;
 	public UnityEvent_Bomb					OnBombExplode;
 	public UnityEvent_Player				OnPlayerDeathExplode;
 	public UnityEvent_Player				OnPlayerJoin;
 	public UnityEngine.Events.UnityEvent	OnGameFinished;
+	public UnityEngine.Events.UnityEvent	OnGameStart;
 	public UnityEngine.Events.UnityEvent	OnTickEnd;
 	
 
@@ -201,6 +206,9 @@ public class Game : MonoBehaviour {
 
 	public void Tick()
 	{
+		if ( Frame == 0 )
+			OnGameStart.Invoke();
+
 		Frame++;
 
 		//	move each player
@@ -217,6 +225,8 @@ public class Game : MonoBehaviour {
 				bomb.Duration = player.BombDuration;
 				bomb.Radius = player.BombRadius;
 				Bombs.Add( bomb );
+
+				OnBombPlaced.Invoke(bomb);
 			};
 			
 			if ( !player.Alive )

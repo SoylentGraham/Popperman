@@ -13,9 +13,23 @@ public class PopperMan
 	const int TILE_SOLID	= 2;
 	const int TILE_WALL		= 3;
 	const int TILE_BOMB		= 4;
-	const int TILE_PLAYER	= 5;
-	const int TILE_GHOST	= 6;
-	const int TILE_FLAME	= 7;
+	const int TILE_PLAYER0	= 5;
+	const int TILE_PLAYER1	= 6;
+	const int TILE_PLAYER2	= 7;
+	const int TILE_PLAYER3	= 8;
+	const int TILE_PLAYER4	= 9;
+	const int TILE_PLAYER5	= 10;
+	const int TILE_PLAYER6	= 11;
+	const int TILE_PLAYER7	= 12;
+	const int TILE_GHOST0	= 13;
+	const int TILE_GHOST1	= 14;
+	const int TILE_GHOST2	= 15;
+	const int TILE_GHOST3	= 16;
+	const int TILE_GHOST4	= 17;
+	const int TILE_GHOST5	= 18;
+	const int TILE_GHOST6	= 19;
+	const int TILE_GHOST7	= 20;
+	const int TILE_FLAME	= 21;
 
 
 	public enum Tile
@@ -32,10 +46,27 @@ public class PopperMan
 
 		//	game tiles
 		Bomb		= TILE_BOMB,
-		Player		= TILE_PLAYER,
-		Ghost		= TILE_GHOST,
+		Player0		= TILE_PLAYER0,
+		Player1		= TILE_PLAYER1,
+		Player2		= TILE_PLAYER2,
+		Player3		= TILE_PLAYER3,
+		Player4		= TILE_PLAYER4,
+		Player5		= TILE_PLAYER5,
+		Player6		= TILE_PLAYER6,
+		Player7		= TILE_PLAYER7,
+		Ghost0		= TILE_GHOST0,
+		Ghost1		= TILE_GHOST1,
+		Ghost2		= TILE_GHOST2,
+		Ghost3		= TILE_GHOST3,
+		Ghost4		= TILE_GHOST4,
+		Ghost5		= TILE_GHOST5,
+		Ghost6		= TILE_GHOST6,
+		Ghost7		= TILE_GHOST7,
 		Flame		= TILE_FLAME,
 	}
+
+	public static Tile	GetPlayerTile(int Index) {	return (Tile)( (int)TILE_PLAYER0 + Index ); }
+	public static Tile	GetGhostTile(int Index) {	return (Tile)( (int)TILE_GHOST0 + Index ); }
 
 	public enum Direction
 	{
