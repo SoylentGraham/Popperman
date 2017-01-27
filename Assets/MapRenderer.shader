@@ -16,6 +16,7 @@
 		TileColour_Ident("TileColour_Ident",COLOR) = (1,1,1,1)
 
 		FloorColourMult("FloorColourMult", COLOR ) = (0.1,1,1,1)
+		FloorColourMin("FloorColourMin", COLOR ) = (0.0,0.1,0.1,1)
 		ForcedAlpha("ForcedAlpha", Range(0.5,1) ) = 1
 		IdentDropShadowOffset("IdentDropShadowOffset", range(0,0.10) ) = 0.05
 
@@ -89,6 +90,7 @@
 			float4 TileColour_Flame;
 			float ForcedAlpha;
 			float3 FloorColourMult;
+			float3 FloorColourMin;
 			float4 TileColour_Ident;
 			float IdentDropShadowOffset;
 
@@ -194,8 +196,11 @@
 				return Colour;
 			}
 
-			float4 GetNoise(float2 uv,float Time,float4 Colour)
+			float4 GetNoise(float2 Tilexy,float2 uv,float Time,float4 Colour)
 			{
+				Tilexy /= float2(Width,Height);
+				uv *= Tilexy;
+
 				float Noise = tex2D( NoiseTexture, uv ).y;
 				if ( Noise >= Time )
 					return Colour;
@@ -241,7 +246,39 @@
 				float3 Perlin = tex2D( NoiseTexture, float2(u,v) ).xyz;
 				//Perlin = lerp( float3(1,0,0), float3(0,1,0), Perlin.x );
 				Perlin *= FloorColourMult;
+				Perlin = max( Perlin, FloorColourMin );
 				return float4( Perlin, 1 );
+			}
+
+			float4 GetWallColour(float2 uv)
+			{
+				float Cols = 4;
+				float Rows = 4;
+				float Border = 0.1f;
+				float BorderTop = 1 - (Border);
+
+				int Row = (int)(uv.y * Rows);
+				uv = frac( uv * float2( Cols, Rows ) );
+				
+				if ( fmod(Row, 2.0) == 0.0 )
+				{
+					//	even
+				}
+				else
+				{
+					//	odd
+					uv.x = frac( uv.x + 0.5f );
+				}
+				
+				if ( uv.x < Border || uv.y < Border )
+					return float4(1,0,0,0);
+				if ( uv.x > BorderTop || uv.y > BorderTop )
+					return float4(0,0,0,1);
+
+				float Blend = _CosTime.w;
+				return float4( lerp(TileColour_Wall.xyz,float3(uv,1), Blend ), TileColour_Wall.a );
+				//return float4( uv, 0, 1 );
+				return TileColour_Wall;
 			}
 
 			float4 GetTileColour(int2 Tilexy,int Tile,float2 uv,float AnimTime)
@@ -254,8 +291,8 @@
 					case TILE_NONE:			return TileColour_None;
 					case TILE_FLOOR:		return GetFloorColour( Tilexy, uv );
 					case TILE_SOLID:		return TileColour_Solid;
-					case TILE_WALL:			return TileColour_Wall;
-					case TILE_WALLCRUMBLE:	return GetNoise( uv, AnimTime, TileColour_Wall );
+					case TILE_WALL:			return GetWallColour(uv);
+					case TILE_WALLCRUMBLE:	return GetNoise( Tilexy, uv, AnimTime, GetWallColour(uv) );
 					case TILE_BOMB:			return GetCircle( uv, BombAnimRadius(), TileColour_Bomb );
 					case TILE_PLAYER0:
 					case TILE_PLAYER1:

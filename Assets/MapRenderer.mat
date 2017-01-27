@@ -57,14 +57,20 @@ Material:
       second: 0.0536
     - first:
         name: PlayerRadius
-      second: 0.707
+      second: 0.821
     - first:
         name: Width
       second: 20
     m_Colors:
     - first:
+        name: FloorColourAdd
+      second: {r: 0.20588237, g: 0.20588237, b: 0.20588237, a: 1}
+    - first:
+        name: FloorColourMin
+      second: {r: 0.072, g: 0.122, b: 0.109, a: 1}
+    - first:
         name: FloorColourMult
-      second: {r: 0.466, g: 1, b: 1, a: 1}
+      second: {r: 0.666, g: 1, b: 1, a: 1}
     - first:
         name: TileBomb
       second: {r: 0, g: 0, b: 0, a: 1}
