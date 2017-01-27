@@ -281,6 +281,18 @@
 				return TileColour_Wall;
 			}
 
+			float4 GetSolidColour(float2 uv)
+			{
+				float Border = 0.05f;
+				float BorderTop = 1 - Border;
+				float Change = 0.1f;
+				if ( uv.x < Border || uv.y < Border )
+					return TileColour_Solid + float4(Change,Change,Change,0);
+				if ( uv.x > BorderTop || uv.y > BorderTop )
+					return TileColour_Solid - float4(Change,Change,Change,0);
+				return TileColour_Solid;
+			}
+
 			float4 GetTileColour(int2 Tilexy,int Tile,float2 uv,float AnimTime)
 			{
 				switch( Tile )
@@ -290,7 +302,7 @@
 
 					case TILE_NONE:			return TileColour_None;
 					case TILE_FLOOR:		return GetFloorColour( Tilexy, uv );
-					case TILE_SOLID:		return TileColour_Solid;
+					case TILE_SOLID:		return GetSolidColour(uv);
 					case TILE_WALL:			return GetWallColour(uv);
 					case TILE_WALLCRUMBLE:	return GetNoise( Tilexy, uv, AnimTime, GetWallColour(uv) );
 					case TILE_BOMB:			return GetCircle( uv, BombAnimRadius(), TileColour_Bomb );
