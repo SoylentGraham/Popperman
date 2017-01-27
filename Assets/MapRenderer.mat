@@ -57,7 +57,7 @@ Material:
       second: 0.0536
     - first:
         name: PlayerRadius
-      second: 0.821
+      second: 0.928
     - first:
         name: Width
       second: 20
@@ -85,7 +85,7 @@ Material:
       second: {r: 0, g: 1, b: 0, a: 1}
     - first:
         name: TileColour_Ghost
-      second: {r: 0.5693123, g: 0.5693123, b: 0.99264705, a: 0.497}
+      second: {r: 0.9044118, g: 0.9044118, b: 0.9044118, a: 0.497}
     - first:
         name: TileColour_Ident
       second: {r: 1, g: 1, b: 1, a: 1}

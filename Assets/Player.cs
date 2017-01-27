@@ -11,6 +11,13 @@ public class UnityEvent_String : UnityEngine.Events.UnityEvent <string> {}
 [ExecuteInEditMode]
 public class Player : MonoBehaviour {
 
+	public enum PlayerState
+	{
+		Inactive,
+		Alive,
+		Ghost,
+	}
+
 	const string	IdentAlphabet = "!ABCDEFGHIJKLMNOPQRSTUVWYZ0123456789";
 
 	public int		JoystickIndex = 0;
@@ -50,7 +57,7 @@ public class Player : MonoBehaviour {
 	[Range(1,10)]
 	public int		BombRadius = 2;
 
-	public bool		Alive = false;
+	public PlayerState	State = PlayerState.Inactive;
 
 	[Header("Gameplay sounds etc")]
 	public UnityEngine.Events.UnityEvent	OnBump;
@@ -151,13 +158,13 @@ public class Player : MonoBehaviour {
 		}
 	}
 
-	public void Move(System.Func<int2,bool,Player,bool> CanMoveTo)
+	public void Move(System.Func<int2,PlayerState,Player,bool> CanMoveTo)
 	{
 		if ( Input_Direction == PopperMan.Direction.None )
 			return;
 
 		var NewPos = PopperMan.Move( new int2(x,y), Input_Direction );
-		if ( !CanMoveTo( NewPos, this.Alive, this ) )
+		if ( !CanMoveTo( NewPos, this.State, this ) )
 		{
 			OnBump.Invoke();
 			return;

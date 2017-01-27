@@ -300,6 +300,7 @@
 					case TILE_INVALID:	return TileColour_Invalid;
 
 					case TILE_NONE:			return TileColour_None;
+
 					case TILE_FLOOR:		return GetFloorColour( Tilexy, uv );
 					case TILE_SOLID:		return GetSolidColour(uv);
 					case TILE_WALL:			return GetWallColour(uv);
@@ -356,17 +357,18 @@
 				//return float4(i/200.0f,0,0,1);
 				//return float4(x/(float)Width,y/(float)Height,0,1);
 
-				float Frame = AnimTiles[i].y;
-				float FrameCount = AnimTiles[i].z;
-				float fc = max(1,FrameCount);
+				//	gr: reading from AnimTiles AT ALL mangles output?
+				//float Frame = AnimTiles[i].y;
+				//float FrameCount = AnimTiles[i].z;
+				//float fc = max(1,FrameCount);
 				//float AnimTime = (Frame / fc) + ( FrameDelta * (1/fc) );
 				float AnimTime = 0;
-				/*
-				float AnimTile = AnimTiles[i].x;
-				float GameTile = MapGameTiles[i].y;
-				*/
+
+				//	reading animtiles gives nonsense. switch fails?
+				//float AnimTile = AnimTiles[i].x;
+				//AnimTile = TILE_PLAYER1;
+				float AnimTile = MapGameTiles[i].z;
 				float MapTile = MapGameTiles[i].x;
-				float AnimTile = TILE_NONE;
 				float GameTile = MapGameTiles[i].y;
 				float3 Colour = GetTileColour( float2(x,y), uv, MapTile, GameTile, AnimTile, AnimTime );
 

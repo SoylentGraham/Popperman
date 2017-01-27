@@ -124,11 +124,11 @@ public class Render : MonoBehaviour {
 				if ( Player )
 				{
 					var PlayerIndex = game.Players.IndexOf(Player);
-					GameTile = Player.Alive ? PopperMan.GetPlayerTile(PlayerIndex) : PopperMan.GetGhostTile(PlayerIndex);
+					GameTile = Player.State == Player.PlayerState.Alive ? PopperMan.GetPlayerTile(PlayerIndex) : PopperMan.GetGhostTile(PlayerIndex);
 				}
 			}
 
-			MapGameTiles.Add( new Vector4( (float)MapTile, (float)GameTile, 0, 0 ) );
+			MapGameTiles.Add( new Vector4( (float)MapTile, (float)GameTile, (float)AnimTile, 0 ) );
 			AnimTiles.Add( new Vector4( (float)AnimTile, AnimTime, AnimDuration, 0) );
 		}
 

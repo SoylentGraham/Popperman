@@ -31,7 +31,8 @@ public class Game : MonoBehaviour {
 	};
 
 	[InspectorButton("Tick")]
-	public bool	_Tick;
+	public int	_Tick = 0;
+	bool Playing = false;
 
 	[System.NonSerialized]
 	public int Frame = 0;
@@ -42,7 +43,7 @@ public class Game : MonoBehaviour {
 	float			TickCountdown = 0;
 	float			TickMs {	get {	return 1000 / (float)TicksPerSec; } }
 	float			TickSecs {	get {	return TickMs / 1000.0f; } }
-//	the time (0...1) remaining before the next tick
+	//	the time (0...1) remaining before the next tick
 	public float	FrameDelta { get	{	return (TickSecs-TickCountdown) / TickSecs;	}	}
 
 
@@ -63,15 +64,43 @@ public class Game : MonoBehaviour {
 	public UnityEvent_Bomb					OnBombExplode;
 	public UnityEvent_Player				OnPlayerDeathExplode;
 	public UnityEvent_Player				OnPlayerJoin;
-	public UnityEngine.Events.UnityEvent	OnGameFinished;
 	public UnityEngine.Events.UnityEvent	OnGameStart;
 	public UnityEngine.Events.UnityEvent	OnTickEnd;
 	public UnityEvent_int2					OnWallDestroyed;
 	
+	public UnityEngine.Events.UnityEvent	OnEveryoneDied;
+	public UnityEvent_Player				OnPlayerWin;
+
+
+
+
+	string MapLayout = null;
+
+	public void RestartGame()
+	{
+		var map = GameObject.FindObjectOfType<Map> ();
+	
+		if (MapLayout == null) {
+			MapLayout = map.TilesAsNumbers;
+		} else {
+			map.TilesAsNumbers = MapLayout;
+		}
+
+		foreach (var p in Players) {
+			p.State = Player.PlayerState.Inactive;
+		}
+
+		_Tick = 0;
+		TickCountdown = 0;
+		Playing = true;
+	}
 
 	
 	private void Update()
 	{
+		if (!Playing)
+			return;
+		
 		TickCountdown -= Time.deltaTime;
 		if ( TickCountdown < 0 )
 		{
@@ -186,14 +215,14 @@ public class Game : MonoBehaviour {
 
 	}
 
-	bool CanPlayerMoveTo(int2 xy,bool Alive,Player self)
+	bool CanPlayerMoveTo(int2 xy,Player.PlayerState State,Player self)
 	{
 		var map = GameObject.FindObjectOfType<Map>();
 
 		var MapTile = map[xy];
 
 		//	let ghosts move over stuff!
-		if (Alive)
+		if ( State == Player.PlayerState.Alive )
 		{
 			if (GetBombAt(xy) != null)
 				return false;
@@ -258,15 +287,15 @@ public class Game : MonoBehaviour {
 				OnBombPlaced.Invoke(bomb);
 			};
 			
-			if ( !player.Alive )
+			if ( player.State == Player.PlayerState.Inactive )
 			{
 				if ( player.Input_JoinGame )
 				{
 					//	only join on free space
-					if ( CanPlayerMoveTo( player.xy, true, player ) )
+					if ( CanPlayerMoveTo( player.xy, Player.PlayerState.Alive, player ) )
 					{
 						//	todo: be clever at placing them
-						player.Alive = true;
+						player.State = Player.PlayerState.Alive;
 						OnPlayerJoin.Invoke(player);
 					}
 				}
@@ -308,15 +337,11 @@ public class Game : MonoBehaviour {
 
 		foreach ( var p in KilledPlayers )
 		{
-			p.Alive = false;
+			p.State = Player.PlayerState.Ghost;
 			OnPlayerDeathExplode.Invoke(p);
 		}
 
-		//	check for end of game
-		if ( KilledPlayers.Count > 0 )
-		{
-		}		
-		
+	
 		foreach ( var xy in DestroyedTiles )
 		{
 			var OldTile = map[xy];
@@ -347,6 +372,29 @@ public class Game : MonoBehaviour {
 				OnBombExplode.Invoke(bomb);
 			Bombs.RemoveAt(i);
 		}
+
+
+		//	check for end of game
+		int AlivePlayers = 0;
+		int GhostPlayers = 0;
+		Player AlivePlayer = null;
+
+		foreach (var p in Players) {
+			if (p.State == Player.PlayerState.Alive) {
+				AlivePlayer = p;
+				AlivePlayers++;
+			}
+
+			if (p.State == Player.PlayerState.Ghost)
+				GhostPlayers++;
+		}
+
+		if (AlivePlayers == 0 && GhostPlayers > 0) {
+			OnEveryoneDied.Invoke ();
+		} else if (AlivePlayers == 1 && GhostPlayers > 0) {
+			OnPlayerWin.Invoke (AlivePlayer);
+		}
+
 
 		OnTickEnd.Invoke ();
 	}
