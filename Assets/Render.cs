@@ -95,8 +95,7 @@ public class Render : MonoBehaviour {
 		MapShader.SetInt("Width", map.Width );
 		MapShader.SetInt("Height", map.Height );
 		
-		var MapTiles = new List<float>();
-		var GameTiles = new List<float>();
+		var MapGameTiles = new List<Vector4>();
 		var AnimTiles = new List<Vector4>();
 
 		for ( int i=0;	i<map.Width*map.Height;	i++ )
@@ -129,13 +128,11 @@ public class Render : MonoBehaviour {
 				}
 			}
 
-			MapTiles.Add( (float)MapTile );
-			GameTiles.Add( (float)GameTile );
+			MapGameTiles.Add( new Vector4( (float)MapTile, (float)GameTile, 0, 0 ) );
 			AnimTiles.Add( new Vector4( (float)AnimTile, AnimTime, AnimDuration, 0) );
 		}
 
-		MapShader.SetFloatArray("MapTiles", MapTiles );
-		MapShader.SetFloatArray("GameTiles", GameTiles );
+		MapShader.SetVectorArray("MapGameTiles", MapGameTiles );
 		MapShader.SetVectorArray("AnimTiles", AnimTiles );
 
 		MapShader.SetTexture("IdentTexture", IdentFontTexture );

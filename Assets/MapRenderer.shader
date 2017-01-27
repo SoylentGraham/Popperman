@@ -100,15 +100,14 @@
 			float GlyphRadius;
 
 		#define MAX_WIDTH	20
-		#define MAX_HEIGHT	20
+		#define MAX_HEIGHT	17
 			int Width;
 			int Height;
 			float FrameDelta;
 			float Frame;
 
 			//	gr: on OSX int Tiles[] renders everything as 0 or <invalid>
-			float MapTiles[MAX_WIDTH*MAX_HEIGHT];
-			float GameTiles[MAX_WIDTH*MAX_HEIGHT];
+			float4 MapGameTiles[MAX_WIDTH*MAX_HEIGHT];
 			float4 AnimTiles[MAX_WIDTH*MAX_HEIGHT];
 
 		#define MAX_PLAYERS	8
@@ -293,7 +292,7 @@
 				return TileColour_Solid;
 			}
 
-			float4 GetTileColour(int2 Tilexy,int Tile,float2 uv,float AnimTime)
+			float4 GetTileColour(float2 Tilexy,int Tile,float2 uv,float AnimTime)
 			{
 				switch( Tile )
 				{
@@ -348,18 +347,28 @@
 			fixed4 frag (v2f Frag) : SV_Target
 			{
 				float2 uv = Frag.uv * float2(Width,Height);
-				int x = floor( uv.x );
-				int y = floor( uv.y );
+				float x = floor( uv.x );
+				float y = floor( uv.y );
 				uv = frac(uv);
-				int i = x + (y*Width);
+				float i = x + (y*Width);
 				
-				float AnimTile = AnimTiles[i].x;
+
+				//return float4(i/200.0f,0,0,1);
+				//return float4(x/(float)Width,y/(float)Height,0,1);
 
 				float Frame = AnimTiles[i].y;
 				float FrameCount = AnimTiles[i].z;
-				float AnimTime = (Frame / FrameCount) + ( FrameDelta * (1/FrameCount) );
-				
-				float3 Colour = GetTileColour( int2(x,y), uv, MapTiles[i], GameTiles[i], AnimTile, AnimTime );
+				float fc = max(1,FrameCount);
+				//float AnimTime = (Frame / fc) + ( FrameDelta * (1/fc) );
+				float AnimTime = 0;
+				/*
+				float AnimTile = AnimTiles[i].x;
+				float GameTile = MapGameTiles[i].y;
+				*/
+				float MapTile = MapGameTiles[i].x;
+				float AnimTile = TILE_NONE;
+				float GameTile = MapGameTiles[i].y;
+				float3 Colour = GetTileColour( float2(x,y), uv, MapTile, GameTile, AnimTile, AnimTime );
 
 				//	debug framedelta
 				//Colour = lerp( Colour, float3(uv,0), FrameDelta );
