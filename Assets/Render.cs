@@ -25,6 +25,43 @@ public class Render : MonoBehaviour {
 
 	public List<TickAnimation>	Animations = new List<TickAnimation>();
 
+
+
+	float FadeTime = 0;
+	float FadeDuration = 0;
+	int2 FadeCenter;
+
+	public void DoFadeIn(Player player)
+	{
+		DoFade( player.xy );
+	}
+
+	public void DoFadeIn()
+	{
+		var map = GameObject.FindObjectOfType<Map>();
+		DoFade (new int2 (map.Width / 2, map.Height / 2));
+	}
+
+	public void DoFade(int2 Center)
+	{
+		FadeCenter = Center;
+		FadeTime = 0;
+		FadeDuration = 3;
+	}
+
+	public void DoFadeOut(int2 Center)
+	{
+		var map = GameObject.FindObjectOfType<Map>();
+		DoFade (new int2 (map.Width / 2, map.Height / 2));
+	}
+
+	public void DoFadeOut()
+	{
+		var map = GameObject.FindObjectOfType<Map>();
+		DoFade (new int2 (map.Width / 2, map.Height / 2));
+	}
+
+
 	public Vector2 GetCanvasTileUv(int2 xy)
 	{
 		var map = GameObject.FindObjectOfType<Map>();
@@ -152,7 +189,9 @@ public class Render : MonoBehaviour {
 			PlayerGlyphs.Add(Glyphuv);
 		}
 		MapShader.SetVectorArray("IdentUvs", PlayerGlyphs );
-		
+
+		var Fade4 = new Vector4 ((float)FadeCenter.x, (float)FadeCenter.y, FadeTime, FadeDuration);
+		//MapShader
 
 		UnityEditor.SceneView.RepaintAll();
 	}
