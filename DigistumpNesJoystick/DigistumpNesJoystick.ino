@@ -1,5 +1,7 @@
 //  https://github.com/MHeironimus/ArduinoJoystickLibrary/
 #include <Joystick.h>
+#include "pitches.h" 
+
 
 //  digistump board manager
 //  http://digistump.com/package_digistump_index.json
@@ -7,10 +9,14 @@
 
 //  gr: order of Data,Data,LatchClock rendered data2 not working... this order is okay
 //    maybe something funny about digispark pins...
-int LatchPin = 20;
-int ClockPin = 21;
+#define LatchPin  20
+#define ClockPin  21
+#define LedPin    13  //  nano led =13
+#define SpeakerPin   10
+
 #define PAD_COUNT 8
 int DataPin[PAD_COUNT] = { 2, 3, 4, 5, 6, 7, 8, 9 };
+
 
 #define NES_BUTTON_COUNT 8
 #define JOYSTICK_BUTTON_COUNT 4
@@ -30,6 +36,21 @@ Joystick_ Joystick[PAD_COUNT] = {
 #define AXIS_MID  0
 #define AXIS_MAX  100
 
+#define NES_BUTTON_UP(btns) ( ((btns) & (1<<4)) != 0 )
+#define NES_BUTTON_DOWN(btns) ( ((btns) & (1<<5)) != 0 )
+#define NES_BUTTON_LEFT(btns) ( ((btns) & (1<<6)) != 0 )
+#define NES_BUTTON_RIGHT(btns) ( ((btns) & (1<<7)) != 0 )
+#define NES_BUTTON_SELECT(btns) ( ((btns) & (1<<2)) != 0 )
+#define NES_BUTTON_START(btns) ( ((btns) & (1<<3)) != 0 )
+uint8_t LastNesButtons[PAD_COUNT] = {0,0,0,0,0,0,0,0};
+uint8_t LastPadConnected[PAD_COUNT] = {false,false,false,false,false,false,false,false};
+
+
+void EnableLed(bool Enable)
+{
+ digitalWrite( LedPin, Enable ? HIGH : LOW );
+}
+
 void setup() 
 {
   for ( int p=0;  p<PAD_COUNT;  p++)
@@ -44,9 +65,75 @@ void setup()
   pinMode( ClockPin, OUTPUT );
   for ( int i=0;  i<PAD_COUNT;  i++ )
     pinMode( DataPin[i], INPUT );
+
+
+  pinMode( SpeakerPin, OUTPUT );
+  //EnableLed(false);
+
+  PlayMarioUnderworldIntroSound(SpeakerPin);
+  delay(400);
  }
 
-void GetPadButtons(uint8_t Buttons[PAD_COUNT])
+void PlayMarioUnderworldIntroSound(int Pin)
+{
+  int Tempo = 130;
+  tone(Pin,NOTE_C4,Tempo);
+  delay(Tempo);
+  tone(Pin,NOTE_C5,Tempo);
+  delay(Tempo);
+  tone(Pin,NOTE_A3,Tempo);
+  delay(Tempo);
+  tone(Pin,NOTE_A4,Tempo);
+  delay(Tempo);
+  tone(Pin,NOTE_AS3,Tempo);
+  delay(Tempo);
+  tone(Pin,NOTE_AS4,Tempo);
+  delay(Tempo);
+  
+  noTone(Pin);
+}
+
+void PlayCoinSound(int Pin)
+{
+   // Play coin sound   
+  tone(Pin,NOTE_B5,100);
+  delay(100);
+  tone(Pin,NOTE_E6,850);
+  delay(850);
+  noTone(Pin);
+}
+
+void Play1UpSound(int Pin)
+{
+  // Play 1-up sound
+  tone(Pin,NOTE_E6,125);
+  delay(130);
+  tone(Pin,NOTE_G6,125);
+  delay(130);
+  tone(Pin,NOTE_E7,125);
+  delay(130);
+  tone(Pin,NOTE_C7,125);
+  delay(130);
+  tone(Pin,NOTE_D7,125);
+  delay(130);
+  tone(Pin,NOTE_G7,125);
+  delay(125);
+  noTone(Pin);
+}
+
+void PlayFireballSound(int Pin)
+{
+  // Play Fireball sound
+  tone(Pin,NOTE_G4,35);
+  delay(35);
+  tone(Pin,NOTE_G5,35);
+  delay(35);
+  tone(Pin,NOTE_G6,35);
+  delay(35);
+  noTone(Pin);
+}
+ 
+void GetPadButtons(uint8_t Buttons[PAD_COUNT],bool Connected[PAD_COUNT])
 {
 #define wait delayMicroseconds(12)
 #define latchlow digitalWrite( LatchPin, LOW)
@@ -86,7 +173,8 @@ void GetPadButtons(uint8_t Buttons[PAD_COUNT])
   uint8_t AllButtons = 0xff;
   for ( int p=0;  p<PAD_COUNT;  p++ )
   {
-    if ( Buttons[p] != AllButtons )
+    Connected[p] = ( Buttons[p] != AllButtons );
+    if ( Connected[p] )
       continue;
     Buttons[p] = 0;
   }
@@ -94,10 +182,7 @@ void GetPadButtons(uint8_t Buttons[PAD_COUNT])
 }
 
 
-#define NES_BUTTON_UP(btns) ( ((btns) & (1<<4)) != 0 )
-#define NES_BUTTON_DOWN(btns) ( ((btns) & (1<<5)) != 0 )
-#define NES_BUTTON_LEFT(btns) ( ((btns) & (1<<6)) != 0 )
-#define NES_BUTTON_RIGHT(btns) ( ((btns) & (1<<7)) != 0 )
+
 
 void loop() {
   // If not using plentiful DigiJoystick.delay() calls, make sure to
@@ -114,7 +199,8 @@ void loop() {
 */
 
   uint8_t PadButtons[PAD_COUNT];
-  GetPadButtons( PadButtons );
+  bool PadConnected[PAD_COUNT];
+  GetPadButtons( PadButtons, PadConnected );
 /*
   uint8_t Buttons07 = 0;
   uint8_t Buttons816 = 0;
@@ -129,11 +215,20 @@ void loop() {
   // regular arduino delay() function
   DigiJoystick.delay(50); // wait 50 milliseconds
   */
+  bool PlayFireball = false;
+  bool Play1Up = false;
+
   for ( int p=0;  p<PAD_COUNT;  p++)
   {
     auto& Pad = Joystick[p];
     auto& NesButtons = PadButtons[p];
+    auto NesButtonsPressed = NesButtons & ( NesButtons ^ LastNesButtons[p] );
+    LastNesButtons[p] = NesButtons;
 
+    if ( !LastPadConnected[p] && PadConnected[p] )
+      Play1Up = true;
+    LastPadConnected[p] = PadConnected[p];
+    
     int16_t x = AXIS_MID;
     int16_t y = AXIS_MID;
     if ( NES_BUTTON_LEFT(NesButtons) )
@@ -144,7 +239,10 @@ void loop() {
       y = AXIS_MIN;
     if ( NES_BUTTON_DOWN(NesButtons) )
       y = AXIS_MAX;
-      
+
+    PlayFireball |= NES_BUTTON_SELECT( NesButtonsPressed );
+    //Play1Up |= NES_BUTTON_START( NesButtons );
+    
     Pad.setXAxis( x );
     Pad.setYAxis( y );
     for ( int b=0;  b<JOYSTICK_BUTTON_COUNT; b++ )
@@ -156,6 +254,22 @@ void loop() {
   }
 
 
-    delay(100);
+    if ( PlayFireball )
+    {
+      PlayFireballSound(SpeakerPin);
+    }
+    else if ( Play1Up )
+    {
+      Play1UpSound(SpeakerPin);
+      //PlayCoinSound(SpeakerPin);
+    }
+    else
+    {
+      delay(100);
+    }
+ 
+      
  }
+
+  
 
